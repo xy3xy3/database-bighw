@@ -1,0 +1,17 @@
+# Ignore Python compiled files
+*.pyc
+
+# Ignore the Python cache directory
+__pycache__/
+
+# Ignore database files
+*.db
+local.md
+prompt.txt
+# pnpm前端
+node_modules/
+pnpm-lock.yaml
+
+# 屏蔽 .vscode idea 文件夹
+.vscode/
+.idea/
