@@ -1,0 +1,15 @@
+{% extends 'form_base.html' %}
+{% block title %}
+  题目管理-表单
+{% endblock %}
+{% block content %}
+  {% from 'form_macros.html' import input_field, select_field, textarea_field %}
+  {{ input_field('题目名称', 'name', '请输入题目名称', required=True) }}
+  {{ textarea_field('题目描述', 'content', '请输入题目描述', required=True) }}
+  {{ select_field('题目类型', 'problem_type_id', problem_types, required=True) }}  <!-- 修改为使用 problem_type_id -->
+  {{ input_field('分数', 'score', '请输入分数', required=True) }}
+  {{ input_field('容器端口', 'port', '请输入容器端口', required=True) }}
+  {{ select_field('难度', 'difficulty', [{'value': '1', 'label': '旅行'}, {'value': '2', 'label': '经典'}, {'value': '3', 'label': '专家'}, {'value': '4', 'label': '大师'}], required=True) }}
+  {{ select_field('状态', 'status', [{'value': '1', 'label': '启用'}, {'value': '0', 'label': '禁用'}], required=True) }}
+  {{ select_field('比赛', 'competition_id', competitions, required=True) }}
+{% endblock %}

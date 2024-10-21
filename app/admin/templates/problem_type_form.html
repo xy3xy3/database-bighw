@@ -1,0 +1,9 @@
+{% extends 'form_base.html' %}
+{% block title %}
+  题目类型管理 - 表单
+{% endblock %}
+{% block content %}
+    {% from 'form_macros.html' import input_field %}
+    {{ input_field('类型名', 'name', '请输入类型名', required=True) }}
+    {{ input_field('介绍', 'description', '请输入介绍') }}
+{% endblock %}

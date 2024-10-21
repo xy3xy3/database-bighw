@@ -1,0 +1,60 @@
+{% macro input_field(label, name, placeholder='', type='text', value='', required=False) %}
+  <div class="layui-form-item">
+    <label class="layui-form-label">{{ label }}</label>
+    <div class="layui-input-inline">
+      <input type="{{ type }}" name="{{ name }}" id="{{ name }}" placeholder="{{ placeholder }}" autocomplete="off" class="layui-input" value="{{ value }}" {% if required %}required  lay-verify="required"{% endif %} />
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro select_field(label, name, options=[], required=False) %}
+  <div class="layui-form-item">
+    <label class="layui-form-label">{{ label }}</label>
+    <div class="layui-input-inline">
+      <select name="{{ name }}" id="{{ name }}" class="layui-input" {% if required %}required  lay-verify="required"{% endif %}>
+        {% for option in options %}
+          <option value="{{ option.value }}">{{ option.label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro textarea_field(label, name, placeholder='', required=False) %}
+  <div class="layui-form-item layui-form-text">
+    <label class="layui-form-label">{{ label }}</label>
+    <div class="layui-input-block">
+      <textarea name="{{ name }}" id="{{ name }}" class="layui-textarea" placeholder="{{ placeholder }}" {% if required %}required  lay-verify="required"{% endif %}></textarea>
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro search_field(label, name, placeholder='', type='text', options=[], required=False) %}
+  <div class="layui-inline">
+    <label class="layui-form-label">{{ label }}</label>
+    <div class="layui-input-inline">
+      {% if type == 'select' %}
+        <select name="{{ name }}" id="{{ name }}" class="layui-input" {% if required %}required{% endif %}>
+          <option value="">{{ placeholder }}</option>
+          {% for option in options %}
+            <option value="{{ option.value }}">{{ option.label }}</option>
+          {% endfor %}
+        </select>
+      {% else %}
+        <input type="{{ type }}" name="{{ name }}" id="{{ name }}" placeholder="{{ placeholder }}" autocomplete="off" class="layui-input" {% if required %}required{% endif %} />
+      {% endif %}
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro upload_field(label, name, accept='file', exts='', required=False) %}
+  <div class="layui-form-item">
+    <label class="layui-form-label">{{ label }}</label>
+    <div class="layui-input-inline">
+      <input type="hidden" name="{{ name }}" id="{{ name }}" class="layui-input" {% if required %}required lay-verify="required"{% endif %} />
+      <button type="button" class="layui-btn layui-btn-primary" target-id="{{ name }}" lay-options="{accept: '{{ accept }}', exts: '{{ exts }}'}">
+        <i class="layui-icon layui-icon-upload"></i> 上传
+      </button>
+    </div>
+  </div>
+{% endmacro %}

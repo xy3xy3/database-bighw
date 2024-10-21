@@ -1,0 +1,13 @@
+{% extends 'form_base.html' %}
+{% block title %}
+  用户管理-表单
+{% endblock %}
+{% block content %}
+    {% from 'form_macros.html' import input_field, select_field %}
+    {{ input_field('用户名', 'username', '请输入用户名', required=True) }}
+    {{ input_field('姓名', 'name', '请输入姓名', required=True) }}
+    {{ input_field('学号', 'student_id', '请输入学号', required=True) }}
+    {{ input_field('邮箱', 'email', '请输入邮箱', 'email', required=True) }}
+    {{ input_field('密码', 'password', '请输入密码', 'password', required=False) }}
+    {{ select_field('状态', 'status', [{'value': 'active', 'label': '激活'}, {'value': 'inactive', 'label': '未激活'}], required=True) }}
+{% endblock %}

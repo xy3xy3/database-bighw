@@ -1,0 +1,65 @@
+{% extends 'table_base.html' %} {% block title %} 队伍管理 {% endblock %} {%
+block header %} {% from 'form_macros.html' import search_field %} {{
+search_field('队伍名称', 'name', '请输入队伍名称') }} {{ search_field('队长',
+'captain', '请输入队长名称') }} {{ search_field('状态', 'status', '请选择',
+'select', [{ value: 'INACTIVE', label: '未激活' }, { value: 'PENDING_REVIEW',
+label: '待审核' }, { value: 'ACTIVE', label: '已激活' }]) }} {% endblock %} {%
+block extra_js %}
+<script>
+  var config = {
+    url: "team",
+    name: "队伍",
+    table: {
+      elem: "#LAY-list",
+      url: "/api/admin/team/search",
+      cols: [
+        [
+          { type: "checkbox", fixed: "left" },
+          { field: "id", width: 100, title: "ID", sort: true },
+          { field: "name", title: "名称", width: 150 },
+          {
+            field: "avatar",
+            title: "头像",
+            templet: function (d) {
+              return (
+                '<img style="display: inline-block; width: 50%; height: 100%;" src="' +
+                d.avatar +
+                '">'
+              );
+            },
+            width: 100,
+          },
+          { field: "captain", title: "队长", width: 100 },
+          {
+            field: "status",
+            title: "状态",
+            templet: function (d) {
+              var statusMap = {
+                INACTIVE: "未激活",
+                PENDING_REVIEW: "待审核",
+                ACTIVE: "已激活",
+              };
+              return statusMap[d.status];
+            },
+            width: 200,
+          },
+          { field: "invite_code", title: "邀请码", width: 150 },
+          {
+            title: "操作",
+            minWidth: screen() < 2 ? 150 : 200,
+            align: "center",
+            fixed: "right",
+            toolbar: "#table-action-list",
+          },
+        ],
+      ],
+      page: true,
+      limit: 10,
+      limits: [10, 15, 20, 25, 30],
+      text: {
+        none: "无数据",
+      },
+    },
+  };
+</script>
+{% endblock %}

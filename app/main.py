@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from fastapi import FastAPI
-from routers import user  # , product, order, admin
+from admin.router import admin_router
 from utils import *  # 用于密码哈希等
 from database import init_db  # 导入数据库初始化函数
 from contextlib import asynccontextmanager
@@ -16,10 +16,7 @@ async def lifespan(app: FastAPI):
 # 使用 lifespan 管理生命周期
 app = FastAPI(title="在线购物系统", lifespan=lifespan)
 
-app.include_router(user.router)
-# app.include_router(product.router)
-# app.include_router(order.router)
-# app.include_router(admin.router)
+app.include_router(admin_router)
 
 @app.get("/")
 async def root():

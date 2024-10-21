@@ -1,0 +1,39 @@
+{% extends 'table_base.html' %}
+{% block title %} 题目类型管理 {% endblock %}
+{% block header %}
+    {% from 'form_macros.html' import search_field %}
+    {{ search_field('类型名', 'name', '请输入类型名') }}
+    {{ search_field('介绍', 'description', '请输入介绍') }}
+{% endblock %}
+{% block extra_js %}
+<script>
+  var config = {
+    url: "problem_type",
+    name: "题目类型",
+    table: {
+      elem: "#LAY-list",
+      url: "/api/admin/problem_type/search",
+      cols: [
+        [
+          { type: "checkbox", fixed: "left" },
+          { field: "id", width: 80, title: "ID", sort: true },
+          { field: "name", title: "类型名", width: 150 },
+          { field: "description", title: "介绍", width: 200 },
+          {
+            title: "操作",
+            minWidth: 150,
+            align: "center",
+            fixed: "right",
+            toolbar: "#table-action-list",
+          },
+        ],
+      ],
+      page: true,
+      limit: 10,
+      text: {
+        none: "暂无数据",
+      },
+    },
+  };
+</script>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'form_base.html' %} {% block title %} 队伍管理-表单 {% endblock %} {%
+block content %} {% from 'form_macros.html' import input_field, select_field %}
+{{ input_field('队伍名称', 'name', '请输入队伍名称', required=True) }}
+
+<div class="layui-form-item">
+  <label class="layui-form-label">队长</label>
+  <div class="layui-input-inline">
+    <select name="captain_id" required lay-verify="required">
+      <option value="">请选择队长</option>
+      {% for user in users %}
+      <option value="{{ user.id }}">{{ user.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+</div>
+
+{{ input_field('邀请码', 'invite_code', '请输入邀请码') }} {{
+select_field('状态', 'status', [ { 'value': 'INACTIVE', 'label': '未激活' }, {
+'value': 'PENDING_REVIEW', 'label': '待审核' }, { 'value': 'ACTIVE', 'label':
+'已激活' } ], required=True) }} {% endblock %}

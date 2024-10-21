@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>
+      {% block title %}
+        AI比赛管理后台
+      {% endblock %}
+    </title>
+    <meta name="renderer" content="webkit" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/admin/static/layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="/admin/static/adminui/dist/css/admin.css" media="all" />
+    {% block extra_head %}
+
+    {% endblock %}
+  </head>
+  <body>
+    <div class="layui-fluid">
+      <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+          <div class="layui-form-item">
+            {% block header %}
+
+            {% endblock %}
+            <div class="layui-inline">
+              <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="LAY-search"><i class="layui-icon layui-icon-search layuiadmin-button-btn"></i></button>
+            </div>
+          </div>
+        </div>
+        <div class="layui-card-body">
+          {% block body %}
+            <div style="padding-bottom: 10px">
+              <button class="layui-btn layuiadmin-btn-list" data-type="batchdel">删除</button>
+            </div>
+            <table id="LAY-list" lay-filter="LAY-list"></table>
+            <script type="text/html" id="table-action-list">
+            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">
+              <i class="layui-icon layui-icon-delete"></i>
+              <span class="layui-hide-xs">删除</span>
+            </a>
+          </script>
+          {% endblock %}
+        </div>
+      </div>
+    </div>
+
+    <script src="/admin/static/layui/layui.js"></script>
+    <script>
+      function screen() {
+        var width = window.innerWidth;
+        if (width > 1200) {
+          return 3; // 大屏幕
+        } else if (width > 992) {
+          return 2; // 中屏幕
+        } else if (width > 768) {
+          return 1; // 小屏幕
+        } else {
+          return 0; // 超小屏幕
+        }
+      }
+    </script>
+    {% block extra_js %}
+
+    {% endblock %}
+    <script>
+      layui
+        .config({
+          base: "/admin/static/", // 静态资源所在路径
+        })
+        .use(['laydate',"index", "table", "laytpl", "admin"], function () {
+
+          var laydate = layui.laydate,table = layui.table,
+            form = layui.form,
+            laytpl = layui.laytpl,
+            admin = layui.admin,
+            $ = layui.$,
+            setter = layui.setter,
+            request = setter.request;
+
+
+          if (document.getElementById('start_time')) {
+            laydate.render({
+              elem: '#start_time', // 开始时间元素的 ID
+              type: 'date' // 设置日期选择器类型为日期
+            })
+          }
+
+          if (document.getElementById('end_time')) {
+            laydate.render({
+              elem: '#end_time', // 结束时间元素的 ID
+              type: 'date' // 设置日期选择器类型为日期
+            })
+          }
+          table.set({
+            method: "post",
+            contentType: "application/json;charset=UTF-8",
+            dataType: "json",
+            headers: {
+              access_token: layui.data(setter.tableName)[request.tokenName],
+            },
+          });
+
+          table.render(window.config.table);
+
+          // 搜索事件
+          form.on("submit(LAY-search)", function (data) {
+            var field = data.field;
+            table.reload("LAY-list", {
+              where: field,
+            });
+          });
+
+          // 添加和删除事件
+          var active = {
+            batchdel: function () {
+              var checkStatus = table.checkStatus("LAY-list"),
+                checkData = checkStatus.data;
+
+              if (checkData.length === 0) {
+                return layer.msg("请选择数据");
+              }
+
+              layer.confirm(
+                "确定删除选中的" + window.config.name + "吗？",
+                function (index) {
+                  var ids = checkData.map((item) => item.id);
+                  admin.req({
+                    url: "/api/admin/" + window.config.url,
+                    method: "DELETE",
+                    contentType: "application/json;charset=UTF-8",
+                    data: JSON.stringify({ ids: ids }),
+                    success: function (res) {
+                      layer.msg(res.msg);
+                      if (res.code === 0) {
+                        table.reload("LAY-list");
+                      }
+                    },
+                  });
+                  layer.close(index);
+                }
+              );
+            },
+          };
+
+          // 监听工具条
+          table.on("tool(LAY-list)", function (obj) {
+            var data = obj.data;
+            console.log(data)
+            if (obj.event === "del") {
+              layer.confirm(
+                "确定删除" + window.config.name + "吗？",
+                function (index) {
+                  admin.req({
+                    url: "/api/admin/" + window.config.url + '/' + data.id,
+                    method: "DELETE",
+                    success: function (res) {
+                      layer.msg(res.msg);
+                      if (res.code === 0) {
+                        table.reload("LAY-list");
+                      }
+                    },
+                  });
+                  layer.close(index);
+                }
+              );
+            }
+          });
+
+          // 绑定按钮事件
+          $(".layui-btn.layuiadmin-btn-list").on("click", function () {
+            var type = $(this).data("type");
+            active[type] && active[type].call(this);
+          });
+        });
+    </script>
+  </body>
+</html>
