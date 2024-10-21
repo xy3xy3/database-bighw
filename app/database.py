@@ -1,7 +1,11 @@
 from sqlmodel import SQLModel, create_engine, Session
 from config import settings
-from models.UserModel import UserModel
+from models.CategoryModel import CategoryModel
 from models.ConfigModel import ConfigModel
+from models.OrderModel import OrderModel
+from models.PaymentModel import PaymentModel
+from models.ProductModel import ProductModel
+from models.UserModel import UserModel
 from utils import hash_password
 
 engine = create_engine(settings.DATABASE_URL, echo=True)

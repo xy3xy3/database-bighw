@@ -1,7 +1,6 @@
-from sqlmodel import Field
-from typing import Optional
-from models.BaseModel import BaseModel
+from sqlmodel import SQLModel, Field
 
-class ConfigModel(BaseModel, table=True):
-    k: str = Field(unique=True, index=True)
+class ConfigModel(SQLModel, table=True):
+    __tablename__ = "Config"
+    k: str = Field(unique=True, index=True, primary_key=True)
     v: str

@@ -4,10 +4,10 @@ from models.BaseModel import BaseModel
 from models.OrderModel import OrderModel
 
 class PaymentModel(BaseModel, table=True):
-    order_id: Optional[int] = Field(default=None, foreign_key="ordermodel.id")
+    __tablename__ = "Payment"
+    # 关联订单，可以是充值 或者 支付订单
+    order_id: Optional[int] = Field(default=None, foreign_key="Order.id")
+    # 金额
     amount: float
-    payment_method: str  # 如 "credit_card", "paypal" 等
-    payment_status: str  # 如 "completed", "pending", "failed" 等
-
-    # 关系 - 每个支付信息对应一个订单
-    order: Optional["OrderModel"] = Relationship(back_populates="payment")
+    method: str  # 如 "credit_card", "paypal" 等
+    status: str  # 如 "completed", "pending", "failed" 等
