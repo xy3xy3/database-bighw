@@ -1,24 +1,110 @@
-from sqlmodel import SQLModel, create_engine, Session
+import psycopg2
+from psycopg2 import pool
 from config import settings
-from models.CategoryModel import CategoryModel
-from models.ConfigModel import ConfigModel
-from models.OrderModel import OrderModel
-from models.PaymentModel import PaymentModel
-from models.ProductModel import ProductModel
-from models.UserModel import UserModel
-from utils import hash_password
-
-engine = create_engine(settings.DATABASE_URL, echo=True)
-
 def init_db():
-    # 创建表结构
-    SQLModel.metadata.create_all(engine)
+    """初始化数据库，创建所需的表"""
+    conn = psycopg2.connect(
+        dbname=settings.db_name,
+        user=settings.db_user,
+        password=settings.db_password,
+        host=settings.db_host,
+        port=settings.db_port,
+        options=f"-c search_path={settings.db_schema}"
+    )
+    cursor = conn.cursor()
 
-    # 在ConfigModel创建k,v管理员
-    with Session(engine) as session:
-        admin_config = ConfigModel(k="admin", v="admin")
-        session.add(admin_config)
-        session.commit()
-def get_session():
-    with Session(engine) as session:
-        yield session
+    # 先创建 Category 表
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS "Category" (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(255) UNIQUE,
+            description TEXT,
+            sort INT DEFAULT 0
+        );
+    """)
+
+    # 创建 User 表
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS "User" (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(255),
+            email VARCHAR(255) UNIQUE,
+            hashed_password VARCHAR(255),
+            balance FLOAT DEFAULT 0.0
+        );
+    """)
+
+    # 创建 Product 表 (依赖 Category)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS "Product" (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(255),
+            price FLOAT,
+            stock INT DEFAULT 0,
+            sort INT DEFAULT 0,
+            description TEXT,
+            category_id INT,
+            CONSTRAINT fk_category FOREIGN KEY (category_id) REFERENCES "Category" (id)
+        );
+    """)
+
+    # 创建 Order 表 (依赖 User 和 Product)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS "Order" (
+            id SERIAL PRIMARY KEY,
+            user_id INT,
+            product_id INT,
+            quantity INT,
+            total_price FLOAT,
+            status VARCHAR(50),
+            CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES "User" (id),
+            CONSTRAINT fk_product FOREIGN KEY (product_id) REFERENCES "Product" (id)
+        );
+    """)
+
+    # 创建 Payment 表 (依赖 Order)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS "Payment" (
+            id SERIAL PRIMARY KEY,
+            order_id INT,
+            amount FLOAT,
+            method VARCHAR(50),
+            status VARCHAR(50),
+            CONSTRAINT fk_order FOREIGN KEY (order_id) REFERENCES "Order" (id)
+        );
+    """)
+
+    # 创建 Config 表
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS "Config" (
+            k VARCHAR(255) PRIMARY KEY,
+            v TEXT
+        );
+    """)
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+class Database:
+    def __init__(self):
+        self.connection_pool = pool.SimpleConnectionPool(
+            1,  # 最小连接数
+            10,  # 最大连接数
+            user=settings.db_user,
+            password=settings.db_password,
+            host=settings.db_host,
+            port=settings.db_port,
+            database=settings.db_name,
+            options=f"-c search_path={settings.db_schema}"
+        )
+
+    def get_connection(self):
+        return self.connection_pool.getconn()
+
+    def release_connection(self, conn):
+        self.connection_pool.putconn(conn)
+
+    def close_all(self):
+        self.connection_pool.closeall()
+
+db = Database()

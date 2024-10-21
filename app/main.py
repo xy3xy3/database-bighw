@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from fastapi import FastAPI
 from routers import user  # , product, order, admin
 from utils import *  # 用于密码哈希等

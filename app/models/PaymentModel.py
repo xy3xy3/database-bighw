@@ -1,13 +1,19 @@
-from sqlmodel import Field, Relationship
-from typing import Optional
 from models.BaseModel import BaseModel
-from models.OrderModel import OrderModel
 
-class PaymentModel(BaseModel, table=True):
-    __tablename__ = "Payment"
-    # 关联订单，可以是充值 或者 支付订单
-    order_id: Optional[int] = Field(default=None, foreign_key="Order.id")
-    # 金额
-    amount: float
-    method: str  # 如 "credit_card", "paypal" 等
-    status: str  # 如 "completed", "pending", "failed" 等
+class PaymentModel(BaseModel):
+    table_name = "Payment"
+
+    def __init__(self):
+        super().__init__()
+
+    def create_payment(self, order_id: int, amount: float, method: str, status: str):
+        data = {
+            "order_id": order_id,
+            "amount": amount,
+            "method": method,
+            "status": status
+        }
+        return self.save(data)
+
+    def get_by_order_id(self, order_id: int):
+        return self.query({"order_id": order_id})

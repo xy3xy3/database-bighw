@@ -1,6 +1,6 @@
 fastapi
 uvicorn
-sqlmodel
 pydantic-settings
 python-dotenv
 passlib
+psycopg2
