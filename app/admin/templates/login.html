@@ -54,11 +54,10 @@
           form.on('submit(LAY-user-login-submit)', function (obj) {
             var load = layer.load();
             $.ajax({
-              url: '/api/admin/login', // 修改后的正确路径
-              data: JSON.stringify(obj.field),
+              url: '/admin/doLogin',
+              data: obj.field,
               method: 'POST',
               dataType: 'json',
-              contentType: 'application/json',
               success: function (res) {
                 if (res.code == 0) {
                   layer.msg(

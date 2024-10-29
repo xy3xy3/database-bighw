@@ -1,16 +1,36 @@
 import psycopg2
 from psycopg2 import pool
 from config import settings
+import logging
+
+class Database:
+    def __init__(self):
+        logging.info(f"Database schema: {settings.db_schema}")
+        self.connection_pool = pool.SimpleConnectionPool(
+            1,  # 最小连接数
+            10,  # 最大连接数
+            user=settings.db_user,
+            password=settings.db_password,
+            host=settings.db_host,
+            port=settings.db_port,
+            database=settings.db_name,
+            options=f"-c search_path={settings.db_schema}"
+        )
+
+    def get_connection(self):
+        return self.connection_pool.getconn()
+
+    def release_connection(self, conn):
+        self.connection_pool.putconn(conn)
+
+    def close_all(self):
+        self.connection_pool.closeall()
+
+db = Database()
+
 def init_db():
     """初始化数据库，创建所需的表"""
-    conn = psycopg2.connect(
-        dbname=settings.db_name,
-        user=settings.db_user,
-        password=settings.db_password,
-        host=settings.db_host,
-        port=settings.db_port,
-        options=f"-c search_path={settings.db_schema}"
-    )
+    conn = db.get_connection()
     cursor = conn.cursor()
 
     # 先创建 Category 表
@@ -82,29 +102,29 @@ def init_db():
         );
     """)
 
+    # Config设置默认admin_user,admin_pwd
+    cursor.execute("""
+        INSERT INTO "Config" (k, v) VALUES ('admi_user', 'admin'), ('admin_pwd', 'admin');
+    """)
+
     conn.commit()
     cursor.close()
     conn.close()
-class Database:
-    def __init__(self):
-        self.connection_pool = pool.SimpleConnectionPool(
-            1,  # 最小连接数
-            10,  # 最大连接数
-            user=settings.db_user,
-            password=settings.db_password,
-            host=settings.db_host,
-            port=settings.db_port,
-            database=settings.db_name,
-            options=f"-c search_path={settings.db_schema}"
-        )
+def reset_db():
+    """重置数据库，删除所有表"""
+    conn = db.get_connection()
+    cursor = conn.cursor()
 
-    def get_connection(self):
-        return self.connection_pool.getconn()
+    # 删除所有表（按依赖关系删除）
+    cursor.execute("""
+        DROP TABLE IF EXISTS "Payment";
+        DROP TABLE IF EXISTS "Order";
+        DROP TABLE IF EXISTS "Product";
+        DROP TABLE IF EXISTS "User";
+        DROP TABLE IF EXISTS "Category";
+        DROP TABLE IF EXISTS "Config";
+    """)
 
-    def release_connection(self, conn):
-        self.connection_pool.putconn(conn)
-
-    def close_all(self):
-        self.connection_pool.closeall()
-
-db = Database()
+    conn.commit()
+    cursor.close()
+    conn.close()

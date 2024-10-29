@@ -4,3 +4,5 @@ pydantic-settings
 python-dotenv
 passlib
 psycopg2
+jinja2
+python-multipart
