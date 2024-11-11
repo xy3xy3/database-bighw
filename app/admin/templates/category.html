@@ -1,0 +1,39 @@
+{% extends 'table_base.html' %}
+{% block title %} 分类管理 {% endblock %}
+{% block header %}
+  {% from 'form_macros.html' import search_field %}
+  {{ search_field('分类名称', 'name', '请输入分类名称') }}
+{% endblock %}
+{% block extra_js %}
+<script>
+  var config = {
+    url: "category",
+    name: "分类",
+    table: {
+      elem: "#LAY-list",
+      url: "/admin/category/search",
+      cols: [
+        [
+          { type: "checkbox", fixed: "left" },
+          { field: "id", width: 80, title: "ID", sort: true },
+          { field: "name", title: "分类名称", width: 150 },
+          { field: "description", title: "描述", width: 200 },
+          { field: "sort", title: "排序", width: 100 },
+          {
+            title: "操作",
+            minWidth: 150,
+            align: "center",
+            fixed: "right",
+            toolbar: "#table-action-list",
+          },
+        ],
+      ],
+      page: true,
+      limit: 10,
+      text: {
+        none: "暂无数据",
+      },
+    },
+  };
+</script>
+{% endblock %}

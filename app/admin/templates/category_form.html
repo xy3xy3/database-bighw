@@ -1,0 +1,8 @@
+{% extends 'form_base.html' %}
+{% block title %} 分类管理-表单 {% endblock %}
+{% block content %}
+    {% from 'form_macros.html' import input_field %}
+    {{ input_field('分类名称', 'name', '请输入分类名称', required=True) }}
+    {{ input_field('描述', 'description', '请输入分类描述') }}
+    {{ input_field('排序', 'sort', '请输入排序', 'number', required=False) }}
+{% endblock %}
