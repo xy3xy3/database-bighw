@@ -105,7 +105,7 @@ def init_db():
 
     # Config设置默认admin_user,admin_pwd
     cursor.execute("""
-        INSERT INTO "Config" (k, v) VALUES ('admi_user', 'admin'), ('admin_pwd', 'admin');
+        INSERT INTO "Config" (k, v) VALUES ('admin_user', 'admin'), ('admin_pwd', 'admin');
     """)
 
     conn.commit()

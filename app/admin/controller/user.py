@@ -1,7 +1,8 @@
 from typing import Optional
 from fastapi import APIRouter, Request, Depends
 from fastapi.templating import Jinja2Templates
-from admin.controller.commonModel import ResponseModel
+from admin.utils.commonModel import ResponseModel
+from admin.utils.decorators import login_required
 from database import db
 from models.UserModel import UserModel
 import os
@@ -14,10 +15,12 @@ templates = Jinja2Templates(directory=TEMPLATES_DIR)
 router = APIRouter()
 
 #html部分
+@login_required
 @router.get("/admin/user")
 async def user_list(request: Request):
     return templates.TemplateResponse("user.html", {"request": request})
 
+@login_required
 @router.get("/admin/user_form")
 async def user_form(request: Request):
     user_model = UserModel()
@@ -25,7 +28,7 @@ async def user_form(request: Request):
     return templates.TemplateResponse("user_form.html", {"request": request, "users": users})
 
 #数据处理部分
-
+@login_required
 @router.post("/admin/user/search")
 async def user_list_ajax(request: Request, page: int = 1, limit: int = 10,
                           name: Optional[str] = None, email: Optional[str] = None):
@@ -52,6 +55,7 @@ async def user_list_ajax(request: Request, page: int = 1, limit: int = 10,
 
 # 表单保存用户
 @router.post("/admin/user/save")
+@login_required
 async def user_save(request: Request):
     form_data = await request.form()
     user_model = UserModel()
@@ -87,6 +91,7 @@ async def user_save(request: Request):
 
 # 删除单个用户
 @router.post("/admin/user/del")
+@login_required
 async def user_del(request: Request):
     form_data = await request.form()
     user_id = form_data.get("id")

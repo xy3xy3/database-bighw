@@ -1,7 +1,8 @@
 from typing import Optional
 from fastapi import APIRouter, Request, Depends
 from fastapi.templating import Jinja2Templates
-from admin.controller.commonModel import ResponseModel
+from admin.utils.commonModel import ResponseModel
+from admin.utils.decorators import login_required
 from database import db
 import os
 
@@ -14,10 +15,11 @@ router = APIRouter()
 
 
 @router.get("/admin/")
+@login_required
 async def index(request: Request):
-    print("111")
     return templates.TemplateResponse("index.html", {"request": request})
 
 @router.get("/admin/console")
+@login_required
 async def console(request: Request):
     return templates.TemplateResponse("console.html", {"request": request})

@@ -3,6 +3,7 @@ import os
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from admin.router import admin_router
+from middleware.auth import AdminAuthMiddleware
 from utils import *  # 用于密码哈希等
 from database import init_db, reset_db  # 导入数据库初始化函数
 from contextlib import asynccontextmanager
@@ -11,8 +12,10 @@ from contextlib import asynccontextmanager
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # 启动时执行的操作
-    reset_db() # 清空数据库，测试阶段使用
-    init_db()  # 初始化数据库
+    test = 1
+    if test:
+        reset_db()
+        init_db()
     yield  # 在这里切换到应用程序的运行阶段
     # 应用关闭时执行的操作（如果有）
 
@@ -24,6 +27,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # 配置静态文件路径
 ADMIN_STATIC_DIR = os.path.join(BASE_DIR, "app", "admin", "static")
 app.mount("/admin/static", StaticFiles(directory=ADMIN_STATIC_DIR), name="admin_static")
+
+app.add_middleware(AdminAuthMiddleware)
 
 app.include_router(admin_router)
 
