@@ -1,0 +1,11 @@
+{% extends 'set_base.html' %}
+{% block title %}
+  设置
+{% endblock %}
+{% block content %}
+  {% from 'form_macros.html' import input_field, select_field, textarea_field %}
+  {{ input_field('SMTP服务器', 'smtp_server', '请输入SMTP服务器地址', value=smtp_config.smtp_server, required=True) }}
+  {{ input_field('SMTP端口', 'smtp_port', '请输入SMTP端口号', type='number', value=smtp_config.smtp_port, required=True) }}
+  {{ input_field('SMTP用户', 'smtp_user', '请输入SMTP用户名', type='text', value=smtp_config.smtp_user, required=True) }}
+  {{ input_field('SMTP密码', 'smtp_password', '请输入SMTP密码', type='text', value=smtp_config.smtp_password, required=True) }}
+{% endblock %}
