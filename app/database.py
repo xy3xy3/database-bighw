@@ -59,6 +59,7 @@ def init_db():
         CREATE TABLE IF NOT EXISTS "Product" (
             id SERIAL PRIMARY KEY,
             name VARCHAR(255),
+            img_url VARCHAR(255),
             price FLOAT,
             stock INT DEFAULT 0,
             sort INT DEFAULT 0,
