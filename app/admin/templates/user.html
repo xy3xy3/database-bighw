@@ -1,28 +1,26 @@
-{% extends 'table_base.html' %} {% block title %} 用户管理 {% endblock %} {%
-block header %} {% from 'form_macros.html' import search_field %} {{
-search_field('用户名', 'username', '请输入用户名') }} {{
-search_field('邮箱','email', '请输入邮箱') }} {{ search_field('学号',
-'student_id', '请输入学号') }} {% endblock %} {% block extra_js %}
+{% extends 'table_base.html' %}
+{% block title %} 用户管理 {% endblock %}
+{% block header %}
+  {% from 'form_macros.html' import search_field %}
+  {{ search_field('用户名', 'name', '请输入用户名') }}
+  {{ search_field('邮箱', 'email', '请输入邮箱') }}
+  {{ search_field('余额', 'balance', '请输入余额') }}
+{% endblock %}
+{% block extra_js %}
 <script>
   var config = {
     url: "user",
     name: "用户",
     table: {
       elem: "#LAY-list",
-      url: "/api/admin/user/search",
+      url: "/admin/user/search",
       cols: [
         [
           { type: "checkbox", fixed: "left" },
           { field: "id", width: 80, title: "ID", sort: true },
-          { field: "username", title: "用户名", width: 150 },
+          { field: "name", title: "用户名", width: 150 },
           { field: "email", title: "邮箱", width: 200 },
-          { field: "student_id", title: "学号", width: 150 },
-          {
-            field: "is_active",
-            title: "状态",
-            width: 100,
-            templet: (d) => (d.is_active ? "激活" : "未激活"),
-          },
+          { field: "balance", title: "余额", width: 120 },
           {
             title: "操作",
             minWidth: 150,

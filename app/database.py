@@ -49,7 +49,7 @@ def init_db():
             id SERIAL PRIMARY KEY,
             name VARCHAR(255),
             email VARCHAR(255) UNIQUE,
-            hashed_password VARCHAR(255),
+            pwd VARCHAR(255),
             balance FLOAT DEFAULT 0.0
         );
     """)

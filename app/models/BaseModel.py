@@ -22,13 +22,14 @@ class BaseModel:
         return self.cursor.fetchone()
 
     def update(self, id: int, data: dict):
-        """更新表中的数据"""
-        set_clause = ', '.join([f"{k} = %({k})s" for k in data.keys()])
-        sql = f'UPDATE "{settings.db_schema}"."{self.table_name}" SET {set_clause} WHERE id = %(id)s RETURNING *'
-        data['id'] = id
-        self.cursor.execute(sql, data)
+        """更新表中的数据（拼接字符串版）"""
+        set_clause = ', '.join([f'"{k}" = \'{v}\'' for k, v in data.items()])
+        sql = f'UPDATE "{settings.db_schema}"."{self.table_name}" SET {set_clause} WHERE id = {id}'
+        print("Executing SQL:", sql)  # 输出拼接后的 SQL
+        self.cursor.execute(sql)
         self.conn.commit()
-        return self.cursor.fetchone()
+        return True
+
 
     def delete(self, id: int):
         """删除表中的数据"""
@@ -54,6 +55,7 @@ class BaseModel:
             sql += f" LIMIT {limit}"
         if offset:
             sql += f" OFFSET {offset}"
+        print(sql)
         self.cursor.execute(sql, conditions)
         return self.cursor.fetchall()
 

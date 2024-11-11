@@ -6,11 +6,12 @@ class UserModel(BaseModel):
     def __init__(self):
         super().__init__()
 
-    def create_user(self, name: str, email: str, hashed_password: str):
+    def create_user(self, name: str, email: str, pwd: str,balance:str):
         data = {
             "name": name,
             "email": email,
-            "hashed_password": hashed_password
+            "pwd": pwd,
+            "balance": balance,
         }
         return self.save(data)
 

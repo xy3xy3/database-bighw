@@ -132,10 +132,9 @@
                 function (index) {
                   var ids = checkData.map((item) => item.id);
                   admin.req({
-                    url: "/api/admin/" + window.config.url,
-                    method: "DELETE",
-                    contentType: "application/json;charset=UTF-8",
-                    data: JSON.stringify({ ids: ids }),
+                    url: "/admin/" + window.config.url + '/del_batch',
+                    method: "POST",
+                    data: { ids: ids },
                     success: function (res) {
                       layer.msg(res.msg);
                       if (res.code === 0) {
@@ -167,10 +166,9 @@
                     function (data) {
                       var field = data.field;
                       admin.req({
-                        url: "/api/admin/" + window.config.url,
+                        url: "/admin/" + window.config.url + "/save",
                         method: "POST",
-                        contentType: "application/json;charset=UTF-8",
-                        data: JSON.stringify(field),
+                        data: field,
                         success: function (res) {
                           layer.msg(res.msg);
                           if (res.code === 0) {
@@ -196,8 +194,9 @@
                 "确定删除" + window.config.name + "吗？",
                 function (index) {
                   admin.req({
-                    url: "/api/admin/" + window.config.url + '/' + data.id,
-                    method: "DELETE",
+                    url: "/admin/" + window.config.url + '/del',
+                    data: { id: data.id },
+                    method: "POST",
                     success: function (res) {
                       layer.msg(res.msg);
                       if (res.code === 0) {
@@ -228,10 +227,9 @@
                     function (data) {
                       var field = data.field;
                       admin.req({
-                        url: "/api/admin/" + window.config.url + "/" + field.id,
-                        method: "PUT",
-                        contentType: "application/json;charset=UTF-8",
-                        data: JSON.stringify(field),
+                        url: "/admin/" + window.config.url + "/save",
+                        method: "POST",
+                        data: field,
                         success: function (res) {
                           if (res.code == 0) {
                             layer.msg(res.msg, { icon: 1 });

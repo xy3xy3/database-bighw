@@ -2,6 +2,9 @@ from fastapi import APIRouter
 
 admin_router = APIRouter()
 
+from admin.controller.index import router as index_router
+admin_router.include_router(index_router)
+
 from admin.controller.user import router as user_router
 admin_router.include_router(user_router)
 

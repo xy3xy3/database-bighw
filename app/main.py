@@ -11,8 +11,8 @@ from contextlib import asynccontextmanager
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # 启动时执行的操作
-    reset_db() # 清空数据库，测试阶段使用
-    init_db()  # 初始化数据库
+    # reset_db() # 清空数据库，测试阶段使用
+    # init_db()  # 初始化数据库
     yield  # 在这里切换到应用程序的运行阶段
     # 应用关闭时执行的操作（如果有）
 
