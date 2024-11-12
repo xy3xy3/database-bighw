@@ -1,0 +1,41 @@
+{% extends 'table_base.html' %}
+{% block title %} 订单管理 {% endblock %}
+{% block header %}
+  {% from 'form_macros.html' import search_field %}
+  {{ search_field('订单编号', 'order_id', '请输入订单编号') }}
+{% endblock %}
+{% block extra_js %}
+<script>
+  var config = {
+    url: "order",
+    name: "订单",
+    table: {
+      elem: "#LAY-list",
+      url: "/admin/order/search",
+      cols: [
+        [
+          { type: "checkbox", fixed: "left" },
+          { field: "id", width: 80, title: "ID", sort: true },
+          { field: "user_id", title: "用户ID", width: 100 },
+          { field: "product_id", title: "商品ID", width: 100 },
+          { field: "quantity", title: "数量", width: 100 },
+          { field: "total_price", title: "总价", width: 100 },
+          { field: "status", title: "状态", width: 100 },
+          {
+            title: "操作",
+            minWidth: 150,
+            align: "center",
+            fixed: "right",
+            toolbar: "#table-action-list",
+          },
+        ],
+      ],
+      page: true,
+      limit: 10,
+      text: {
+        none: "暂无数据",
+      },
+    },
+  };
+</script>
+{% endblock %}
