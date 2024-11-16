@@ -1,26 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="stylesheet" href="/static/layui-vue/index.css" />
-    <script src="/static/vue/vue.global.js"></script>
-    <script src="/static/layui-vue/index.js"></script>
-  </head>
-  <body>
-    <div id="app">
-      <lay-button type="primary">{{ message }}</lay-button>
-    </div>
-    <script>
-      const App = {
-        data() {
-          return {
-            message: 'Hello World'
-          }
-        }
+<% extends 'base.html' %>
+
+<% block content %>
+<lay-button type="primary">{{ message }}</lay-button>
+<% endblock %>
+
+<% block script %>
+<script>
+  const App = {
+    data() {
+      return {
+        message: 'Hello World'
       }
-      const app = Vue.createApp(App)
-      app.use(LayuiVue)
-      app.mount('#app')
-    </script>
-  </body>
-</html>
+    }
+  }
+  const app = Vue.createApp(App)
+  app.use(LayuiVue)
+  app.mount('#app')
+</script>
+<% endblock %>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="/static/layui-vue/index.css" />
+    <script src="/static/vue/vue.global.js"></script>
+    <script src="/static/layui-vue/index.js"></script>
+    <title><< title >></title>
+    <style>
+      .layui-footer,
+      .layui-header {
+        line-height: 60px;
+        text-align: center;
+        background: #87ca9a;
+        color: white;
+      }
+      .layui-side {
+        display: flex;
+        background: #77c38c;
+        align-items: center;
+        justify-content: center;
+        color: white;
+      }
+      .layui-body {
+        display: flex;
+        background: #5fb878;
+        align-items: center;
+        justify-content: center;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <lay-layout>
+        <lay-header><% include 'nav.html' %></lay-header>
+        <lay-body>
+          <% block content %>
+          <% endblock %>
+        </lay-body>
+        <lay-footer>
+          <p>&copy; 2024 Your Shop. All rights reserved.</p>
+        </lay-footer>
+      </lay-layout>
+    </div>
+
+    <% block script %>
+    <% endblock %>
+  </body>
+</html>
