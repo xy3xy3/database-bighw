@@ -8,8 +8,8 @@ class AdminAuthMiddleware(BaseHTTPMiddleware):
         data = get_session(request, key)
         print(f"Session data: {data}")
         if data:
-            request.state.isLogin = True
+            request.state.isAdminLogin = True
         else:
-            request.state.isLogin = False
+            request.state.isAdminLogin = False
         response = await call_next(request)
         return response

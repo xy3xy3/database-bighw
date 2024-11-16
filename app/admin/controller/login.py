@@ -15,11 +15,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
-@router.get("/admin/login")
+@router.get("/login")
 async def login(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
 
-@router.post("/admin/doLogin")
+@router.post("/doLogin")
 async def doLogin(request: Request, response: Response):
     form = await request.form()
     username = form.get("username")

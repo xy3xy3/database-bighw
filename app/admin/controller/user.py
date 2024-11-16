@@ -16,12 +16,12 @@ router = APIRouter()
 
 #html部分
 @login_required
-@router.get("/admin/user")
+@router.get("/user")
 async def user_list(request: Request):
     return templates.TemplateResponse("user.html", {"request": request})
 
 @login_required
-@router.get("/admin/user_form")
+@router.get("/user_form")
 async def user_form(request: Request):
     user_model = UserModel()
     users = user_model.query()
@@ -29,7 +29,7 @@ async def user_form(request: Request):
 
 #数据处理部分
 @login_required
-@router.post("/admin/user/search")
+@router.post("/user/search")
 async def user_list_ajax(request: Request, page: int = 1, limit: int = 10,
                           name: Optional[str] = None, email: Optional[str] = None):
     user_model = UserModel()
@@ -54,7 +54,7 @@ async def user_list_ajax(request: Request, page: int = 1, limit: int = 10,
     return response
 
 # 表单保存用户
-@router.post("/admin/user/save")
+@router.post("/user/save")
 @login_required
 async def user_save(request: Request):
     form_data = await request.form()
@@ -90,7 +90,7 @@ async def user_save(request: Request):
 
 
 # 删除单个用户
-@router.post("/admin/user/del")
+@router.post("/user/del")
 @login_required
 async def user_del(request: Request):
     form_data = await request.form()
@@ -112,7 +112,7 @@ async def user_del(request: Request):
 
 
 # 删除多个用户
-@router.post("/admin/user/del_batch")
+@router.post("/user/del_batch")
 async def user_del_batch(request: Request):
     form_data = await request.form()
     user_ids = form_data.getlist("ids[]")  # 获取多个用户 ID

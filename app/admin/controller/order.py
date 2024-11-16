@@ -11,19 +11,19 @@ templates = Jinja2Templates(directory=TEMPLATES_DIR)
 router = APIRouter()
 
 # 订单列表页面
-@router.get("/admin/order")
+@router.get("/order")
 @login_required
 async def order(request: Request):
     return templates.TemplateResponse("order.html", {"request": request})
 
 # 订单表单页面
-@router.get("/admin/order_form")
+@router.get("/order_form")
 @login_required
 async def order_form(request: Request):
     return templates.TemplateResponse("order_form.html", {"request": request})
 
 # 搜索订单
-@router.post("/admin/order/search")
+@router.post("/order/search")
 @login_required
 async def order_search(request: Request, page: int = 1, limit: int = 10):
     order_model = OrderModel()
@@ -36,7 +36,7 @@ async def order_search(request: Request, page: int = 1, limit: int = 10):
     )
 
 # 保存订单
-@router.post("/admin/order/save")
+@router.post("/order/save")
 @login_required
 async def order_save(request: Request):
     form_data = await request.form()
@@ -70,7 +70,7 @@ async def order_save(request: Request):
     )
 
 # 删除订单
-@router.post("/admin/order/del")
+@router.post("/order/del")
 @login_required
 async def order_del(request: Request):
     form_data = await request.form()

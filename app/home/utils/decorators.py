@@ -9,7 +9,7 @@ def login_required(func):
         request: Request = kwargs.get("request")
         print(f"Decorator accessed request: {request}")
 
-        if not request or not hasattr(request.state, "isAdminLogin") or not request.state.isAdminLogin:
+        if not request or not hasattr(request.state, "isUserLogin") or not request.state.isUserLogin:
             if request.method == "GET":
                 # 如果是GET请求，重定向到登录页面
                 return RedirectResponse(url="/admin/login", status_code=302)

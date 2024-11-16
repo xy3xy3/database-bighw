@@ -3,6 +3,7 @@ import os
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from admin.router import admin_router
+from home.router import home_router
 from middleware.auth import AdminAuthMiddleware
 from utils import *  # 用于密码哈希等
 from database import init_db, reset_db  # 导入数据库初始化函数
@@ -24,17 +25,24 @@ app = FastAPI(title="在线购物系统", lifespan=lifespan)
 
 # 获取项目的根目录
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# 配置静态文件路径
+admin_app = FastAPI()
+admin_app.add_middleware(AdminAuthMiddleware)
+admin_app.include_router(admin_router)
+
+# 挂载admin静态资源
 ADMIN_STATIC_DIR = os.path.join(BASE_DIR, "app", "admin", "static")
 app.mount("/admin/static", StaticFiles(directory=ADMIN_STATIC_DIR), name="admin_static")
 
-app.add_middleware(AdminAuthMiddleware)
+app.mount("/admin", admin_app)
 
-app.include_router(admin_router)
+home_app = FastAPI()
+home_app.include_router(home_router)
 
-@app.get("/")
-async def root():
-    return {"message": "欢迎使用在线购物系统"}
+# 挂载首页静态资源
+HOME_STATIC_DIR = os.path.join(BASE_DIR, "app", "home", "static")
+app.mount("/static", StaticFiles(directory=HOME_STATIC_DIR), name="home_static")
+
+app.mount("/", home_app)
 
 if __name__ == "__main__":
     import uvicorn

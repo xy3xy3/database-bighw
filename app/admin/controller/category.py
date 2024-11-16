@@ -15,19 +15,19 @@ templates = Jinja2Templates(directory=TEMPLATES_DIR)
 router = APIRouter()
 
 # 分类列表页面
-@router.get("/admin/category")
+@router.get("/category")
 @login_required
 async def category_list(request: Request):
     return templates.TemplateResponse("category.html", {"request": request})
 
 # 分类表单页面
-@router.get("/admin/category_form")
+@router.get("/category_form")
 @login_required
 async def category_form(request: Request):
     return templates.TemplateResponse("category_form.html", {"request": request})
 
 # 搜索分类
-@router.post("/admin/category/search")
+@router.post("/category/search")
 @login_required
 async def category_list_ajax(request: Request, page: int = 1, limit: int = 10,
                               name: Optional[str] = None):
@@ -45,7 +45,7 @@ async def category_list_ajax(request: Request, page: int = 1, limit: int = 10,
     )
 
 # 保存分类
-@router.post("/admin/category/save")
+@router.post("/category/save")
 @login_required
 async def category_save(request: Request):
     form_data = await request.form()
@@ -75,7 +75,7 @@ async def category_save(request: Request):
     )
 
 # 删除分类
-@router.post("/admin/category/del")
+@router.post("/category/del")
 @login_required
 async def category_del(request: Request):
     form_data = await request.form()
