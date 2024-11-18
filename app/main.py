@@ -35,14 +35,14 @@ app.mount("/admin/static", StaticFiles(directory=ADMIN_STATIC_DIR), name="admin_
 
 app.mount("/admin", admin_app)
 
-home_app = FastAPI()
-home_app.include_router(home_router)
+# home_app = FastAPI()
+# home_app.include_router(home_router)
 
-# 挂载首页静态资源
-HOME_STATIC_DIR = os.path.join(BASE_DIR, "app", "home", "static")
-app.mount("/static", StaticFiles(directory=HOME_STATIC_DIR), name="home_static")
+# # 挂载首页静态资源
+# HOME_STATIC_DIR = os.path.join(BASE_DIR, "app", "home", "static")
+# app.mount("/static", StaticFiles(directory=HOME_STATIC_DIR), name="home_static")
 
-app.mount("/", home_app)
+# app.mount("/", home_app)
 
 if __name__ == "__main__":
     import uvicorn
