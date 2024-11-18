@@ -3,7 +3,7 @@ import os
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from admin.router import admin_router
-from home.router import home_router
+# from home.router import home_router
 from middleware.auth import AdminAuthMiddleware
 from utils import *  # 用于密码哈希等
 from database import init_db, reset_db  # 导入数据库初始化函数
