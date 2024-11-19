@@ -24,7 +24,7 @@
 
 使用conda python 3.12 环境
 ```shell
-conda create -n dbhw python=3.12
+conda create -n dbhw python=3.12 -y
 conda activate dbhw
 ```
 
