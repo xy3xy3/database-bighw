@@ -30,5 +30,6 @@ conda activate dbhw
 
 安装依赖包
 ```shell
+pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 pip install -r requirements.txt
 ```
