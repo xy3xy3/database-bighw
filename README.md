@@ -41,11 +41,12 @@
 
 使用conda python 3.12 环境
 ```shell
-conda create -n dbhw python=3.12
+conda create -n dbhw python=3.12 -y
 conda activate dbhw
 ```
 
 安装依赖包
 ```shell
+pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 pip install -r requirements.txt
 ```
