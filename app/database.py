@@ -33,80 +33,27 @@ def init_db():
     conn = db.get_connection()
     cursor = conn.cursor()
 
-    # 先创建 Category 表
+    # 创建 history 表
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS "Category" (
+        CREATE TABLE IF NOT EXISTS history (
             id SERIAL PRIMARY KEY,
-            name VARCHAR(255) UNIQUE,
-            description TEXT,
-            sort INT DEFAULT 0
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+            agent_id INTEGER
         );
     """)
 
-    # 创建 User 表
+    # 创建 message 表
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS "User" (
+        CREATE TABLE IF NOT EXISTS message (
             id SERIAL PRIMARY KEY,
-            name VARCHAR(255),
-            email VARCHAR(255) UNIQUE,
-            pwd VARCHAR(255),
-            balance FLOAT DEFAULT 0.0
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+            history_id INTEGER,
+            role VARCHAR(50),
+            content TEXT
         );
     """)
 
-    # 创建 Product 表 (依赖 Category)
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS "Product" (
-            id SERIAL PRIMARY KEY,
-            name VARCHAR(255),
-            img_url VARCHAR(255),
-            price FLOAT,
-            stock INT DEFAULT 0,
-            sort INT DEFAULT 0,
-            description TEXT,
-            category_id INT,
-            CONSTRAINT fk_category FOREIGN KEY (category_id) REFERENCES "Category" (id)
-        );
-    """)
-
-    # 创建 Order 表 (依赖 User 和 Product)
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS "Order" (
-            id SERIAL PRIMARY KEY,
-            user_id INT,
-            product_id INT,
-            quantity INT,
-            total_price FLOAT,
-            status VARCHAR(50),
-            CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES "User" (id),
-            CONSTRAINT fk_product FOREIGN KEY (product_id) REFERENCES "Product" (id)
-        );
-    """)
-
-    # 创建 Payment 表 (依赖 Order)
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS "Payment" (
-            id SERIAL PRIMARY KEY,
-            order_id INT,
-            amount FLOAT,
-            method VARCHAR(50),
-            status VARCHAR(50),
-            CONSTRAINT fk_order FOREIGN KEY (order_id) REFERENCES "Order" (id)
-        );
-    """)
-
-    # 创建 Config 表
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS "Config" (
-            k VARCHAR(255) PRIMARY KEY,
-            v TEXT
-        );
-    """)
-
-    # Config设置默认admin_user,admin_pwd
-    cursor.execute("""
-        INSERT INTO "Config" (k, v) VALUES ('admin_user', 'admin'), ('admin_pwd', 'admin');
-    """)
+    # 其他表的创建语句...
 
     conn.commit()
     cursor.close()
@@ -118,12 +65,8 @@ def reset_db():
 
     # 删除所有表（按依赖关系删除）
     cursor.execute("""
-        DROP TABLE IF EXISTS "Payment";
-        DROP TABLE IF EXISTS "Order";
-        DROP TABLE IF EXISTS "Product";
-        DROP TABLE IF EXISTS "User";
-        DROP TABLE IF EXISTS "Category";
-        DROP TABLE IF EXISTS "Config";
+        DROP TABLE IF EXISTS "history";
+        DROP TABLE IF EXISTS "message";
     """)
 
     conn.commit()
