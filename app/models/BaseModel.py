@@ -6,6 +6,7 @@ from config import settings
 
 class BaseModel:
     table_name: str  # 子类需要定义表名
+    create_sql:str = None  # 子类需要定义创建表的SQL语句
 
     def __init__(self):
         self.conn = db.get_connection()
