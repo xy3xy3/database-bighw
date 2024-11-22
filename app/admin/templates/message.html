@@ -1,0 +1,39 @@
+{% extends 'table_base.html' %}
+{% block title %} 消息管理 {% endblock %}
+{% block header %}
+  {% from 'form_macros.html' import search_field %}
+  {{ search_field('历史记录ID', 'history_id', '请输入历史记录ID') }}
+{% endblock %}
+{% block extra_js %}
+<script>
+  var config = {
+    url: "message",
+    name: "消息",
+    table: {
+      elem: "#LAY-list",
+      url: "/admin/message/search",
+      cols: [
+        [
+          { type: "checkbox", fixed: "left" },
+          { field: "id", width: 80, title: "ID", sort: true },
+          { field: "history_id", title: "历史记录ID", width: 150 },
+          { field: "role", title: "角色", width: 100 },
+          { field: "content", title: "内容", width: 200 },
+          {
+            title: "操作",
+            minWidth: 150,
+            align: "center",
+            fixed: "right",
+            toolbar: "#table-action-list",
+          },
+        ],
+      ],
+      page: true,
+      limit: 10,
+      text: {
+        none: "暂无数据",
+      },
+    },
+  };
+</script>
+{% endblock %}

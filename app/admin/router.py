@@ -11,13 +11,14 @@ admin_router.include_router(user_router)
 from admin.controller.category import router as category_router
 admin_router.include_router(category_router)
 
-
 from admin.controller.login import router as login_router
 admin_router.include_router(login_router)
-
 
 from admin.controller.order import router as order_router
 admin_router.include_router(order_router)
 
 from admin.controller.model import router as model_router
 admin_router.include_router(model_router)
+
+from admin.controller.message import router as message_router
+admin_router.include_router(message_router)

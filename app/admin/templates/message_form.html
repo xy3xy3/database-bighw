@@ -1,0 +1,8 @@
+{% extends 'form_base.html' %}
+{% block title %} 消息管理-表单 {% endblock %}
+{% block content %}
+    {% from 'form_macros.html' import input_field %}
+    {{ input_field('历史记录ID', 'history_id', '请输入历史记录ID', required=True) }}
+    {{ input_field('角色', 'role', '请输入角色', required=True) }}
+    {{ input_field('内容', 'content', '请输入内容', required=True) }}
+{% endblock %}
