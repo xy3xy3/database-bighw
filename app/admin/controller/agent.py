@@ -28,7 +28,8 @@ async def agent_form(request: Request):
 @login_required
 async def agent_search(request: Request, page: int = 1, limit: int = 10, name: Optional[str] = None):
     agent_model = AgentModel()
-    paginated_data = agent_model.search_agents(name=name, limit=limit, offset=(page - 1) * limit)
+    conditions = {}
+    paginated_data = agent_model.get_paginated(page=page, per_page=limit, conditions=conditions)
 
     return ResponseModel(
         code=0,

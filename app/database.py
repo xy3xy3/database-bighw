@@ -3,6 +3,9 @@ from psycopg2 import pool
 from config import settings
 import logging
 
+# 配置日志记录
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 class Database:
     def __init__(self):
         logging.info(f"Database schema: {settings.db_schema}")
@@ -18,22 +21,27 @@ class Database:
         )
 
     def get_connection(self):
+        logging.info("Getting a database connection from the pool.")
         return self.connection_pool.getconn()
 
     def release_connection(self, conn):
+        logging.info("Releasing the database connection back to the pool.")
         self.connection_pool.putconn(conn)
 
     def close_all(self):
+        logging.info("Closing all database connections in the pool.")
         self.connection_pool.closeall()
 
 db = Database()
 
 def init_db():
     """初始化数据库，创建所需的表"""
+    logging.info("Initializing the database.")
     conn = db.get_connection()
     cursor = conn.cursor()
 
     # 创建 history 表
+    logging.info("Creating history table if it does not exist.")
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS history (
             id SERIAL PRIMARY KEY,
@@ -44,6 +52,7 @@ def init_db():
     """)
 
     # 创建 message 表，添加外键依赖 history 表
+    logging.info("Creating message table if it does not exist.")
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS message (
             id SERIAL PRIMARY KEY,
@@ -55,6 +64,7 @@ def init_db():
     """)
 
     # 创建 model 表
+    logging.info("Creating model table if it does not exist.")
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS model (
             id SERIAL PRIMARY KEY,
@@ -66,6 +76,7 @@ def init_db():
     """)
 
     # 创建 knowledgebase 表，添加外键依赖 model 表
+    logging.info("Creating knowledgebase table if it does not exist.")
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS knowledgebase (
             id SERIAL PRIMARY KEY,
@@ -76,6 +87,7 @@ def init_db():
     """)
 
     # 创建 knowledge_content 表，添加外键依赖 knowledgebase 表
+    logging.info("Creating knowledge_content table if it does not exist.")
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS knowledge_content (
             id SERIAL PRIMARY KEY,
@@ -88,6 +100,7 @@ def init_db():
     """)
 
     # 创建 Config 表
+    logging.info("Creating config table if it does not exist.")
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS "config" (
             k VARCHAR(255) PRIMARY KEY,
@@ -95,7 +108,8 @@ def init_db():
         );
     """)
 
-      # 创建 Agent 表
+    # 创建 Agent 表
+    logging.info("Creating agent table if it does not exist.")
     cursor.execute("""
         CREATE TABLE agent (
             id SERIAL PRIMARY KEY,
@@ -110,8 +124,8 @@ def init_db():
         );
     """)
 
-
     # Config设置默认admin_user,admin_pwd
+    logging.info("Inserting default admin_pwd into config table if it does not exist.")
     cursor.execute("""
         INSERT INTO "config" (k, v)
         SELECT 'admin_pwd', 'admin'
@@ -122,31 +136,47 @@ def init_db():
     conn.commit()
     cursor.close()
     conn.close()
+    logging.info("Database initialization completed.")
 
 def reset_db():
     """重置数据库，删除所有表"""
+    logging.info("Resetting the database.")
     conn = db.get_connection()
     cursor = conn.cursor()
 
     # 禁用外键约束检查
+    logging.info("Disabling foreign key checks.")
     cursor.execute("SET session_replication_role = 'replica';")
 
     try:
         # 按依赖关系删除表
+        logging.info("Dropping agent table if it exists.")
         cursor.execute("DROP TABLE IF EXISTS agent CASCADE;")
+        logging.info("Dropping message table if it exists.")
         cursor.execute("DROP TABLE IF EXISTS message CASCADE;")
+        logging.info("Dropping knowledge_content table if it exists.")
         cursor.execute("DROP TABLE IF EXISTS knowledge_content CASCADE;")
+        logging.info("Dropping knowledgebase table if it exists.")
         cursor.execute("DROP TABLE IF EXISTS knowledgebase CASCADE;")
+        logging.info("Dropping history table if it exists.")
         cursor.execute("DROP TABLE IF EXISTS history CASCADE;")
+        logging.info("Dropping model table if it exists.")
         cursor.execute("DROP TABLE IF EXISTS model CASCADE;")
+        logging.info("Dropping config table if it exists.")
         cursor.execute("DROP TABLE IF EXISTS config CASCADE;")
 
         conn.commit()
+        logging.info("Database reset completed.")
     except Exception as e:
         conn.rollback()
-        print(f"Error resetting database: {e}")
+        logging.error(f"Error resetting database: {e}")
     finally:
         # 恢复外键约束检查
+        logging.info("Enabling foreign key checks.")
         cursor.execute("SET session_replication_role = 'origin';")
         cursor.close()
         conn.close()
+
+# 示例调用
+# init_db()
+# reset_db()

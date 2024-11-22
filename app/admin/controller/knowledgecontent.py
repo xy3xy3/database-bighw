@@ -57,7 +57,7 @@ async def knowledgecontent_save(request: Request):
     content = form_data.get("content")
     embedding = form_data.get("embedding")
 
-    if content_id:
+    if content_id and content_id!=0:
         data = {"base_id": base_id, "content": content, "embedding": embedding}
         model.update(int(content_id), data)
         msg = "知识库内容更新成功"
