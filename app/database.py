@@ -28,6 +28,7 @@ class Database:
 
 db = Database()
 
+# File: app\database.py
 def init_db():
     """初始化数据库，创建所需的表"""
     conn = db.get_connection()
@@ -52,16 +53,28 @@ def init_db():
             content TEXT
         );
     """)
-    # 创建model表
+
+    # 创建 model 表
     cursor.execute("""
-    CREATE TABLE model (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    base_url VARCHAR(255) NOT NULL,
-    api_key VARCHAR(255) NOT NULL,
-    type INT NOT NULL
+    CREATE TABLE IF NOT EXISTS model (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        base_url VARCHAR(255) NOT NULL,
+        api_key VARCHAR(255) NOT NULL,
+        type INT NOT NULL
     );  
-    """)                             
+    """)
+
+    # 创建 knowledgebase 表
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS knowledgebase (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        description TEXT NOT NULL,
+        model_id INT NOT NULL
+    );  
+    """)
+
     # 其他表的创建语句...
     
     # 创建 Config 表
@@ -86,8 +99,9 @@ def reset_db():
 
     # 删除所有表（按依赖关系删除）
     cursor.execute("""
-        DROP TABLE IF EXISTS "history";
         DROP TABLE IF EXISTS "message";
+        DROP TABLE IF EXISTS "knowledgebase";
+        DROP TABLE IF EXISTS "history";
         DROP TABLE IF EXISTS "model";
         DROP TABLE IF EXISTS "config";
     """)

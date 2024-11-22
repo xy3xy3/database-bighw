@@ -1,26 +1,24 @@
 {% extends 'table_base.html' %}
-{% block title %} 用户管理 {% endblock %}
+{% block title %} 知识库管理 {% endblock %}
 {% block header %}
-  {% from 'form_macros.html' import search_field %}
-  {{ search_field('用户名', 'name', '请输入用户名') }}
-  {{ search_field('邮箱', 'email', '请输入邮箱') }}
-  {{ search_field('余额', 'balance', '请输入余额') }}
+{% from 'form_macros.html' import search_field %}
+{{ search_field('知识库名称', 'name', '请输入知识库名称') }}
 {% endblock %}
 {% block extra_js %}
 <script>
   var config = {
-    url: "user",
-    name: "用户",
+    url: "knowledgebase",
+    name: "知识库",
     table: {
       elem: "#LAY-list",
-      url: "/admin/user/search",
+      url: "/admin/knowledgebase/search",
       cols: [
         [
           { type: "checkbox", fixed: "left" },
           { field: "id", width: 80, title: "ID", sort: true },
-          { field: "name", title: "用户名", width: 150 },
-          { field: "email", title: "邮箱", width: 200 },
-          { field: "balance", title: "余额", width: 120 },
+          { field: "name", title: "知识库名称", width: 150 },
+          { field: "description", title: "介绍", width: 200 },
+          { field: "model_id", title: "向量模型ID", width: 100 },
           {
             title: "操作",
             minWidth: 150,
