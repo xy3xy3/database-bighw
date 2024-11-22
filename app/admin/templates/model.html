@@ -20,11 +20,11 @@
           { field: "base_url", title: "基础URL", width: 200 },
           { field: "api_key", title: "API密钥", width: 200 },
           {
-            field: "type",
+            field: "model_type",
             title: "类型",
             width: 100,
             templet: function (d) {
-              return d.type == 0 ? 'embedding' : 'chat';
+              return d.model_type == 0 ? 'embedding' : 'chat';
             }
           }, {
             title: "操作",

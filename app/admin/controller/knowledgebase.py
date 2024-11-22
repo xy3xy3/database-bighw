@@ -4,6 +4,7 @@ from fastapi import APIRouter, Request, Form
 from fastapi.templating import Jinja2Templates
 from admin.utils.commonModel import ResponseModel
 from admin.utils.decorators import login_required
+from models.ModelModel import ModelModel
 from models.KnowledgeBaseModel import KnowledgeBaseModel
 import os
 
@@ -22,7 +23,13 @@ async def knowledgebase_list(request: Request):
 @router.get("/knowledgebase_form")
 @login_required
 async def knowledgebase_form(request: Request):
-    return templates.TemplateResponse("knowledgebase_form.html", {"request": request})
+    model_model = ModelModel()  # 实例化模型数据访问对象
+    conditions = {
+        "model_type":0,
+    }
+    models = model_model.get_options_list("id", "name",conditions)  # 获取模型列表
+    return templates.TemplateResponse("knowledgebase_form.html", {"request": request, "models": models})
+
 
 # 搜索知识库
 @router.post("/knowledgebase/search")

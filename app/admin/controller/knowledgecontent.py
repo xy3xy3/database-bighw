@@ -3,6 +3,7 @@ from typing import Optional
 from admin.utils.commonModel import ResponseModel
 from admin.utils.decorators import login_required
 from models.KnowledgeContentModel import KnowledgeContentModel
+from models.KnowledgeBaseModel import KnowledgeBaseModel
 from fastapi.templating import Jinja2Templates
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -21,7 +22,9 @@ async def knowledgecontent_list(request: Request):
 @router.get("/knowledgecontent_form")
 @login_required
 async def knowledgecontent_form(request: Request):
-    return templates.TemplateResponse("knowledgecontent_form.html", {"request": request})
+    knowledgebase_model = KnowledgeBaseModel()  # 实例化知识库数据访问对象
+    knowledgebases = knowledgebase_model.get_options_list("id", "name")  # 获取知识库列表
+    return templates.TemplateResponse("knowledgecontent_form.html", {"request": request, "knowledgebases": knowledgebases})
 
 # 知识库内容 - 搜索
 @router.post("/knowledgecontent/search")
@@ -34,7 +37,9 @@ async def knowledgecontent_search(
     keyword: Optional[str] = Form(None),
 ):
     model = KnowledgeContentModel()
-    conditions = {"base_id": base_id}
+    conditions = {}
+    if base_id:
+        conditions['base_id'] = base_id
     if keyword:
         conditions["content"] = f"%{keyword}%"  # 支持模糊查询
     paginated_data = model.get_paginated(page=page, per_page=limit, conditions=conditions)
@@ -53,13 +58,15 @@ async def knowledgecontent_save(request: Request):
     model = KnowledgeContentModel()
 
     content_id = form_data.get("id")
+    if content_id:
+        content_id = int(content_id)
     base_id = form_data.get("base_id")
     content = form_data.get("content")
     embedding = form_data.get("embedding")
 
-    if content_id and content_id!=0:
+    if content_id:
         data = {"base_id": base_id, "content": content, "embedding": embedding}
-        model.update(int(content_id), data)
+        model.update(content_id, data)
         msg = "知识库内容更新成功"
     else:
         data = {"base_id": base_id, "content": content, "embedding": embedding}
