@@ -52,14 +52,20 @@ async def history_save(request: Request):
     agent_id = form_data.get("agent_id")
 
     if history_id:
-        history_model.update(history_id, {
+        data = {
             "flag": flag,
             "agent_id": agent_id
-        })
+        }
+        history_model.update(history_id,data)
         msg = "历史记录更新成功"
     else:
-        history_model.create_history(flag, agent_id)
+        data = {
+            "flag": flag,
+            "agent_id": agent_id
+        }
+        history_model.save(data)
         msg = "历史记录创建成功"
+    
 
     return ResponseModel(
         code=0,

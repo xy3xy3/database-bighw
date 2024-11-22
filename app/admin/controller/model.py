@@ -61,10 +61,22 @@ async def model_save(request: Request):
     model_type = int(form_data.get("type", 0))
 
     if model_id:
-        model_model.update_model(model_id, name=name, base_url=base_url, api_key=api_key, model_type=model_type)
+        data = {
+        "name": form_data.get("name"),
+        "base_url": form_data.get("base_url"),
+        "api_key": form_data.get("api_key"),
+        "model_type": int(form_data.get("type", 0))
+    }
+        model_model.update(model_id, data)
         msg = "模型更新成功"
     else:
-        model_model.create_model(name, base_url, api_key, model_type)
+        data = {
+        "name": form_data.get("name"),
+        "base_url": form_data.get("base_url"),
+        "api_key": form_data.get("api_key"),
+        "model_type": int(form_data.get("type", 0))
+    }
+        model_model.save(data)
         msg = "模型创建成功"
 
     return ResponseModel(
