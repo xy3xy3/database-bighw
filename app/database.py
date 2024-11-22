@@ -95,6 +95,21 @@ def init_db():
         );
     """)
 
+    # 创建 Agent 表
+    cursor.execute("""
+        CREATE TABLE agent (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            base_ids TEXT NOT NULL,
+            max_ref INTEGER NOT NULL,
+            min_cor FLOAT NOT NULL,
+            q_model_id INTEGER NOT NULL,
+            q_prompt TEXT NOT NULL,
+            a_model_id INTEGER NOT NULL,
+            a_prompt TEXT NOT NULL
+        );
+    """)
+
     # Config设置默认admin_user,admin_pwd
     cursor.execute("""
         INSERT INTO "config" (k, v) VALUES ('admin_user', 'admin') 
