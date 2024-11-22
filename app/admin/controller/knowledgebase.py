@@ -1,4 +1,5 @@
 # File: app\admin\controller\knowledgebase.py
+from typing import Optional
 from fastapi import APIRouter, Request, Form
 from fastapi.templating import Jinja2Templates
 from admin.utils.commonModel import ResponseModel
