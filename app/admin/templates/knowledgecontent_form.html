@@ -1,0 +1,8 @@
+{% extends 'form_base.html' %}
+{% block title %} 知识库内容管理-表单 {% endblock %}
+{% block content %}
+    {% from 'form_macros.html' import input_field, textarea_field %}
+    {{ input_field('知识库ID', 'base_id', '请输入知识库ID', 'number', required=True) }}
+    {{ textarea_field('内容', 'content', '请输入内容', required=True) }}
+    {{ input_field('向量数据', 'embedding', '请输入向量数据（JSON格式）', 'text') }}
+{% endblock %}

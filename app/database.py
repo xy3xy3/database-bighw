@@ -28,7 +28,6 @@ class Database:
 
 db = Database()
 
-# File: app\database.py
 def init_db():
     """初始化数据库，创建所需的表"""
     conn = db.get_connection()
@@ -44,12 +43,12 @@ def init_db():
         );
     """)
 
-    # 创建 message 表
+    # 创建 message 表，添加外键依赖 history 表
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS message (
             id SERIAL PRIMARY KEY,
             created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-            history_id INTEGER,
+            history_id INTEGER REFERENCES history(id) ON DELETE CASCADE,
             role VARCHAR(50),
             content TEXT
         );
@@ -57,27 +56,37 @@ def init_db():
 
     # 创建 model 表
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS model (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
-        base_url VARCHAR(255) NOT NULL,
-        api_key VARCHAR(255) NOT NULL,
-        type INT NOT NULL
-    );  
+        CREATE TABLE IF NOT EXISTS model (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            base_url VARCHAR(255) NOT NULL,
+            api_key VARCHAR(255) NOT NULL,
+            type INT NOT NULL
+        );  
     """)
 
-    # 创建 knowledgebase 表
+    # 创建 knowledgebase 表，添加外键依赖 model 表
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS knowledgebase (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
-        description TEXT NOT NULL,
-        model_id INT NOT NULL
-    );  
+        CREATE TABLE IF NOT EXISTS knowledgebase (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            description TEXT NOT NULL,
+            model_id INT REFERENCES model(id) ON DELETE CASCADE
+        );  
     """)
 
-    # 其他表的创建语句...
-    
+    # 创建 knowledge_content 表，添加外键依赖 knowledgebase 表
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS knowledge_content (
+            id SERIAL PRIMARY KEY,
+            base_id INT REFERENCES knowledgebase(id) ON DELETE CASCADE,
+            content TEXT NOT NULL,
+            embedding JSONB,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+    """)
+
     # 创建 Config 表
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS "config" (
@@ -88,25 +97,36 @@ def init_db():
 
     # Config设置默认admin_user,admin_pwd
     cursor.execute("""
-        INSERT INTO "config" (k, v) VALUES ('admin_user', 'admin'), ('admin_pwd', 'admin');
+        INSERT INTO "config" (k, v) VALUES ('admin_user', 'admin') 
+        ON CONFLICT (k) DO NOTHING;
     """)
     conn.commit()
     cursor.close()
     conn.close()
+
 def reset_db():
     """重置数据库，删除所有表"""
     conn = db.get_connection()
     cursor = conn.cursor()
 
-    # 删除所有表（按依赖关系删除）
-    cursor.execute("""
-        DROP TABLE IF EXISTS "message";
-        DROP TABLE IF EXISTS "knowledgebase";
-        DROP TABLE IF EXISTS "history";
-        DROP TABLE IF EXISTS "model";
-        DROP TABLE IF EXISTS "config";
-    """)
+    # 禁用外键约束检查
+    cursor.execute("SET session_replication_role = 'replica';")
 
-    conn.commit()
-    cursor.close()
-    conn.close()
+    try:
+        # 按依赖关系删除表
+        cursor.execute("DROP TABLE IF EXISTS message CASCADE;")
+        cursor.execute("DROP TABLE IF EXISTS knowledge_content CASCADE;")
+        cursor.execute("DROP TABLE IF EXISTS knowledgebase CASCADE;")
+        cursor.execute("DROP TABLE IF EXISTS history CASCADE;")
+        cursor.execute("DROP TABLE IF EXISTS model CASCADE;")
+        cursor.execute("DROP TABLE IF EXISTS config CASCADE;")
+
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        print(f"Error resetting database: {e}")
+    finally:
+        # 恢复外键约束检查
+        cursor.execute("SET session_replication_role = 'origin';")
+        cursor.close()
+        conn.close()

@@ -16,9 +16,11 @@ from admin.controller.message import router as message_router
 admin_router.include_router(message_router)
 
 
+from admin.controller.history import router as history_router
+admin_router.include_router(history_router)
+
 from admin.controller.knowledgebase import router as knowledgebase_router
 admin_router.include_router(knowledgebase_router)
 
-
-from admin.controller.history import router as history_router
-admin_router.include_router(history_router)
+from admin.controller.knowledgecontent import router as knowledgecontent_router
+admin_router.include_router(knowledgecontent_router)
