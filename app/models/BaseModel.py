@@ -1,6 +1,6 @@
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from typing import Optional
+from typing import Any, Dict, Optional
 from database import db
 from config import settings
 
@@ -79,6 +79,13 @@ class BaseModel:
             "per_page": per_page,
             "total_pages": (total // per_page) + (1 if total % per_page != 0 else 0)
         }
+    # 获取source->target映射，用于table的template
+    def get_map(self, source: str, target: str) -> Dict[Any, Any]:
+        sql = f'SELECT "{source}", "{target}" FROM "{settings.db_schema}"."{self.table_name}"'
+        self.cursor.execute(sql)
+        result = self.cursor.fetchall()
+        mapping = {row[source]: row[target] for row in result}
+        return mapping
     def get_options_list(self, value_field: str, label_field: str, conditions: Optional[dict] = None):
         """获取选项列表，格式为 [{value: ..., label: ...}, ...]"""
         sql = f'SELECT "{value_field}" AS value, "{label_field}" AS label FROM "{settings.db_schema}"."{self.table_name}"'

@@ -17,7 +17,9 @@ router = APIRouter()
 @router.get("/knowledgebase")
 @login_required
 async def knowledgebase_list(request: Request):
-    return templates.TemplateResponse("knowledgebase.html", {"request": request})
+    model_model = ModelModel()
+    mapping = model_model.get_map("id","name")
+    return templates.TemplateResponse("knowledgebase.html", {"request": request,"mapping":mapping})
 
 # 知识库表单页面
 @router.get("/knowledgebase_form")

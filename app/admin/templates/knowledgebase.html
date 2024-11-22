@@ -1,10 +1,7 @@
-{% extends 'table_base.html' %}
-{% block title %} 知识库管理 {% endblock %}
-{% block header %}
-{% from 'form_macros.html' import search_field %}
-{{ search_field('知识库名称', 'name', '请输入知识库名称') }}
-{% endblock %}
-{% block extra_js %}
+{% extends 'table_base.html' %} {% block title %} 知识库管理 {% endblock %} {%
+block header %} {% from 'form_macros.html' import search_field %} {{
+search_field('知识库名称', 'name', '请输入知识库名称') }} {% endblock %} {%
+block extra_js %}
 <script>
   var config = {
     url: "knowledgebase",
@@ -18,7 +15,14 @@
           { field: "id", width: 80, title: "ID", sort: true },
           { field: "name", title: "知识库名称", width: 150 },
           { field: "description", title: "介绍", width: 200 },
-          { field: "model_id", title: "向量模型ID", width: 100 },
+          {
+            field: "model_id",
+            title: "向量模型",
+            width: 100,
+            templet: function (d) {
+              return {{ mapping | safe }}[d.model_id];
+            },
+          },
           {
             title: "操作",
             minWidth: 150,
