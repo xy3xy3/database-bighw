@@ -1,7 +1,7 @@
 from models.BaseModel import BaseModel
 
-class ModelModel(BaseModel):
-    table_name = "model"
+class KnowledgeContentModel(BaseModel):
+    table_name = "knowledge_content"
 
     def __init__(self):
         super().__init__()

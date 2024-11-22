@@ -55,10 +55,18 @@ async def message_save(request: Request):
     content = form_data.get("content")
 
     if message_id:
-        message_model.update_message(message_id, role=role, content=content)
+        data = {
+            "role": role,
+            "content": content
+        }
+        message_model.update(message_id,data)
         msg = "消息更新成功"
     else:
-        message_model.create_message(history_id, role, content)
+        data = {
+            "role": role,
+            "content": content
+        }
+        message_model.save(data)
         msg = "消息创建成功"
 
     return ResponseModel(
@@ -75,7 +83,7 @@ async def message_del(request: Request):
     message_model = MessageModel()
 
     if message_id:
-        message_model.delete_message(message_id)
+        message_model.delete(message_id)
         return ResponseModel(
             code=0,
             msg="消息删除成功"
