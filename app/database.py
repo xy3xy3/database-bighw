@@ -94,7 +94,14 @@ def init_db():
             v TEXT
         );
     """)
-
+    # Config设置默认admin_user,admin_pwd
+    cursor.execute("""
+        INSERT INTO "config" (k, v)
+        SELECT 'admin_user', 'admin'
+        WHERE NOT EXISTS (
+            SELECT 1 FROM "config" WHERE k = 'admin_user'
+        );
+    """)
     # Config设置默认admin_user,admin_pwd
     cursor.execute("""
         INSERT INTO "config" (k, v)
