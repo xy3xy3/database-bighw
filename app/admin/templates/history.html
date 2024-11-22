@@ -1,0 +1,39 @@
+{% extends 'table_base.html' %}
+{% block title %} 历史记录管理 {% endblock %}
+{% block header %}
+  {% from 'form_macros.html' import search_field %}
+  {{ search_field('代理ID', 'agent_id', '请输入代理ID') }}
+{% endblock %}
+{% block extra_js %}
+<script>
+  var config = {
+    url: "history",
+    name: "历史记录",
+    table: {
+      elem: "#LAY-list",
+      url: "/admin/history/search",
+      cols: [
+        [
+          { type: "checkbox", fixed: "left" },
+          { field: "id", width: 80, title: "ID", sort: true },
+          { field: "flag", title: "标志位", width: 150 },
+          { field: "time", title: "时间", width: 200 },
+          { field: "agent_id", title: "代理ID", width: 100 },
+          {
+            title: "操作",
+            minWidth: 150,
+            align: "center",
+            fixed: "right",
+            toolbar: "#table-action-list",
+          },
+        ],
+      ],
+      page: true,
+      limit: 10,
+      text: {
+        none: "暂无数据",
+      },
+    },
+  };
+</script>
+{% endblock %}

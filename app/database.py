@@ -63,6 +63,7 @@ def init_db():
     );  
     """)                             
     # 其他表的创建语句...
+    
     # 创建 Config 表
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS "config" (

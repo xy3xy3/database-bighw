@@ -21,3 +21,6 @@ admin_router.include_router(order_router)
 
 from admin.controller.model import router as model_router
 admin_router.include_router(model_router)
+
+from admin.controller.history import router as history_router
+admin_router.include_router(history_router)
