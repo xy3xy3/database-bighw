@@ -54,7 +54,18 @@ def init_db():
     """)
 
     # 其他表的创建语句...
+    # 创建 Config 表
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS "Config" (
+            k VARCHAR(255) PRIMARY KEY,
+            v TEXT
+        );
+    """)
 
+    # Config设置默认admin_user,admin_pwd
+    cursor.execute("""
+        INSERT INTO "Config" (k, v) VALUES ('admin_user', 'admin'), ('admin_pwd', 'admin');
+    """)
     conn.commit()
     cursor.close()
     conn.close()
