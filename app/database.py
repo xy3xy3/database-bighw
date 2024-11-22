@@ -133,6 +133,7 @@ def reset_db():
 
     try:
         # 按依赖关系删除表
+        cursor.execute("DROP TABLE IF EXISTS agent CASCADE;")
         cursor.execute("DROP TABLE IF EXISTS message CASCADE;")
         cursor.execute("DROP TABLE IF EXISTS knowledge_content CASCADE;")
         cursor.execute("DROP TABLE IF EXISTS knowledgebase CASCADE;")
