@@ -1,0 +1,7 @@
+{% extends 'form_base.html' %}
+{% block title %} 历史记录管理-表单 {% endblock %}
+{% block content %}
+    {% from 'form_macros.html' import input_field %}
+    {{ input_field('标志位', 'flag', '请输入标志位', required=True) }}
+    {{ input_field('代理ID', 'agent_id', '请输入代理ID', 'number', required=True) }}
+{% endblock %}
