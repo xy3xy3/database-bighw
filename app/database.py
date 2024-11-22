@@ -28,6 +28,7 @@ class Database:
 
 db = Database()
 
+# File: app\database.py
 def init_db():
     """初始化数据库，创建所需的表"""
     conn = db.get_connection()
@@ -52,16 +53,29 @@ def init_db():
             content TEXT
         );
     """)
-    # 创建model表
+
+    # 创建 model 表
     cursor.execute("""
-    CREATE TABLE model (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    base_url VARCHAR(255) NOT NULL,
-    api_key VARCHAR(255) NOT NULL,
-    type INT NOT NULL
+    CREATE TABLE IF NOT EXISTS model (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        base_url VARCHAR(255) NOT NULL,
+        api_key VARCHAR(255) NOT NULL,
+        type INT NOT NULL
     );  
-    """)                             
+    """)
+
+    # 创建 knowledgebase 表
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS knowledgebase (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        desc TEXT NOT NULL,
+        model_id INT NOT NULL,
+        FOREIGN KEY (model_id) REFERENCES model(id)
+    );  
+    """)
+
     # 其他表的创建语句...
     # 创建 Config 表
     cursor.execute("""

@@ -21,3 +21,6 @@ admin_router.include_router(order_router)
 
 from admin.controller.model import router as model_router
 admin_router.include_router(model_router)
+
+from admin.controller.knowledgebase import router as knowledgebase_router
+admin_router.include_router(knowledgebase_router)

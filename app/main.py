@@ -13,7 +13,7 @@ from contextlib import asynccontextmanager
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # 启动时执行的操作
-    test = 0
+    test = 1
     if test:
         reset_db()
         init_db()
