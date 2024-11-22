@@ -79,7 +79,14 @@ class BaseModel:
             "per_page": per_page,
             "total_pages": (total // per_page) + (1 if total % per_page != 0 else 0)
         }
-
+    def get_options_list(self, value_field: str, label_field: str, conditions: Optional[dict] = None):
+        """获取选项列表，格式为 [{value: ..., label: ...}, ...]"""
+        sql = f'SELECT "{value_field}" AS value, "{label_field}" AS label FROM "{settings.db_schema}"."{self.table_name}"'
+        if conditions:
+            where_clause = ' AND '.join([f"{k} = %({k})s" for k in conditions.keys()])
+            sql += f" WHERE {where_clause}"
+        self.cursor.execute(sql, conditions)
+        return self.cursor.fetchall()
     # 事务管理
     def begin_transaction(self):
         """手动开启事务"""

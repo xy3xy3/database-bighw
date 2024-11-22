@@ -5,7 +5,7 @@ from database import db
 from config import settings
 
 class ConfigModel():
-    table_name = "Config"
+    table_name = "config"
 
     def __init__(self):
         self.conn = db.get_connection()

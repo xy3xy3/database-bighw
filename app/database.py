@@ -71,7 +71,7 @@ def init_db():
             name VARCHAR(255) NOT NULL,
             base_url VARCHAR(255) NOT NULL,
             api_key VARCHAR(255) NOT NULL,
-            type INT NOT NULL
+            model_type INT NOT NULL
         );  
     """)
 
@@ -125,6 +125,14 @@ def init_db():
     """)
 
     # Config设置默认admin_user,admin_pwd
+    logging.info("Inserting default admin_user into config table if it does not exist.")
+    cursor.execute("""
+        INSERT INTO "config" (k, v)
+        SELECT 'admin_user', 'admin'
+        WHERE NOT EXISTS (
+            SELECT 1 FROM "config" WHERE k = 'admin_user'
+        );
+    """)
     logging.info("Inserting default admin_pwd into config table if it does not exist.")
     cursor.execute("""
         INSERT INTO "config" (k, v)

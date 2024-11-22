@@ -4,6 +4,8 @@ from fastapi.templating import Jinja2Templates
 from admin.utils.commonModel import ResponseModel
 from admin.utils.decorators import login_required
 from models.AgentModel import AgentModel
+from models.ModelModel import ModelModel 
+
 import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -21,8 +23,10 @@ async def agent_list(request: Request):
 @router.get("/agent_form")
 @login_required
 async def agent_form(request: Request):
-    return templates.TemplateResponse("agent_form.html", {"request": request})
-
+    model_model = ModelModel()
+    models = model_model.get_options_list("id","name")  # 获取所有模型数据
+    print(models)
+    return templates.TemplateResponse("agent_form.html", {"request": request, "models": models})
 # 搜索Agent
 @router.post("/agent/search")
 @login_required
