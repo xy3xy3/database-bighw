@@ -24,3 +24,9 @@ admin_router.include_router(knowledgebase_router)
 
 from admin.controller.knowledgecontent import router as knowledgecontent_router
 admin_router.include_router(knowledgecontent_router)
+
+from admin.controller.history import router as history_router
+admin_router.include_router(history_router)
+
+from admin.controller.agent import router as agent_router
+admin_router.include_router(agent_router)
