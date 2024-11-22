@@ -21,3 +21,11 @@ admin_router.include_router(model_router)
 
 from admin.controller.message import router as message_router
 admin_router.include_router(message_router)
+
+
+from admin.controller.knowledgebase import router as knowledgebase_router
+admin_router.include_router(knowledgebase_router)
+
+
+from admin.controller.history import router as history_router
+admin_router.include_router(history_router)
