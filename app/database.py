@@ -95,7 +95,7 @@ def init_db():
         );
     """)
 
-    # 创建 Agent 表
+      # 创建 Agent 表
     cursor.execute("""
         CREATE TABLE agent (
             id SERIAL PRIMARY KEY,
@@ -110,10 +110,14 @@ def init_db():
         );
     """)
 
+
     # Config设置默认admin_user,admin_pwd
     cursor.execute("""
-        INSERT INTO "config" (k, v) VALUES ('admin_user', 'admin') 
-        ON CONFLICT (k) DO NOTHING;
+        INSERT INTO "config" (k, v)
+        SELECT 'admin_pwd', 'admin'
+        WHERE NOT EXISTS (
+            SELECT 1 FROM "config" WHERE k = 'admin_pwd'
+        );
     """)
     conn.commit()
     cursor.close()

@@ -3,8 +3,25 @@ from typing import Optional
 from admin.utils.commonModel import ResponseModel
 from admin.utils.decorators import login_required
 from models.KnowledgeContentModel import KnowledgeContentModel
+from fastapi.templating import Jinja2Templates
+import os
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
+templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
 router = APIRouter()
+
+# 知识库列表页面
+@router.get("/knowledgecontent")
+@login_required
+async def knowledgecontent_list(request: Request):
+    return templates.TemplateResponse("knowledgecontent.html", {"request": request})
+
+# 知识库表单页面
+@router.get("/knowledgecontent_form")
+@login_required
+async def knowledgecontent_form(request: Request):
+    return templates.TemplateResponse("knowledgecontent_form.html", {"request": request})
 
 # 知识库内容 - 搜索
 @router.post("/knowledgecontent/search")
@@ -13,7 +30,7 @@ async def knowledgecontent_search(
     request: Request,
     page: int = Form(1),
     limit: int = Form(10),
-    base_id: int = Form(...),
+    base_id: Optional[int] = Form(None),
     keyword: Optional[str] = Form(None),
 ):
     model = KnowledgeContentModel()
