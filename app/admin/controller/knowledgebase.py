@@ -1,5 +1,4 @@
 # File: app\admin\controller\knowledgebase.py
-from typing import Optional
 from fastapi import APIRouter, Request, Form
 from fastapi.templating import Jinja2Templates
 from admin.utils.commonModel import ResponseModel
@@ -80,4 +79,12 @@ async def knowledgebase_del(request: Request):
     knowledgebase_model = KnowledgeBaseModel()
 
     if knowledgebase_id:
-        knowledgebase_model.
+        knowledgebase_model.delete(int(knowledgebase_id))
+        return ResponseModel(
+            code=0,
+            msg="知识库删除成功"
+        )
+    return ResponseModel(
+        code=1,
+        msg="知识库 ID 不能为空"
+    )
