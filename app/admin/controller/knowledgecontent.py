@@ -3,6 +3,11 @@ from typing import Optional
 from admin.utils.commonModel import ResponseModel
 from admin.utils.decorators import login_required
 from models.KnowledgeContentModel import KnowledgeContentModel
+from fastapi.templating import Jinja2Templates
+import os
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
+templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
 router = APIRouter()
 
@@ -25,7 +30,7 @@ async def knowledgecontent_search(
     request: Request,
     page: int = Form(1),
     limit: int = Form(10),
-    base_id: int = Form(...),
+    base_id: Optional[int] = Form(None),
     keyword: Optional[str] = Form(None),
 ):
     model = KnowledgeContentModel()
