@@ -3,6 +3,7 @@ from fastapi.templating import Jinja2Templates
 from admin.utils.commonModel import ResponseModel
 from admin.utils.decorators import login_required
 from models.HistoryModel import HistoryModel
+from models.AgentModel import AgentModel  # 导入 AgentModel
 import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,7 +21,9 @@ async def history_list(request: Request):
 @router.get("/history_form")
 @login_required
 async def history_form(request: Request):
-    return templates.TemplateResponse("history_form.html", {"request": request})
+    agent_model = AgentModel()
+    agents = agent_model.get_options_list("id", "name")  # 获取所有代理数据
+    return templates.TemplateResponse("history_form.html", {"request": request, "agents": agents})
 
 # 搜索历史记录
 @router.post("/history/search")
@@ -56,7 +59,7 @@ async def history_save(request: Request):
             "flag": flag,
             "agent_id": agent_id
         }
-        history_model.update(history_id,data)
+        history_model.update(history_id, data)
         msg = "历史记录更新成功"
     else:
         data = {
@@ -65,7 +68,6 @@ async def history_save(request: Request):
         }
         history_model.save(data)
         msg = "历史记录创建成功"
-    
 
     return ResponseModel(
         code=0,

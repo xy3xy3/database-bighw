@@ -4,6 +4,7 @@ from fastapi.templating import Jinja2Templates
 from admin.utils.commonModel import ResponseModel
 from admin.utils.decorators import login_required
 from models.MessageModel import MessageModel
+from models.HistoryModel import HistoryModel  # 导入 HistoryModel
 import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -21,7 +22,9 @@ async def message_list(request: Request):
 @router.get("/message_form")
 @login_required
 async def message_form(request: Request):
-    return templates.TemplateResponse("message_form.html", {"request": request})
+    history_model = HistoryModel()
+    histories = history_model.get_options_list("id", "flag")  # 获取所有历史记录数据
+    return templates.TemplateResponse("message_form.html", {"request": request, "histories": histories})
 
 # 搜索消息
 @router.post("/message/search")
@@ -59,10 +62,11 @@ async def message_save(request: Request):
             "role": role,
             "content": content
         }
-        message_model.update(message_id,data)
+        message_model.update(message_id, data)
         msg = "消息更新成功"
     else:
         data = {
+            "history_id": history_id,
             "role": role,
             "content": content
         }
