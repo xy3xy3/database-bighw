@@ -93,7 +93,7 @@ async def model_del(request: Request):
     model_model = ModelModel()
 
     if model_id:
-        model_model.delete_model(int(model_id))
+        model_model.delete(int(model_id))
         return ResponseModel(
             code=0,
             msg="模型删除成功"

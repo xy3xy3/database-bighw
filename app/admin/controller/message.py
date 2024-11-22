@@ -83,7 +83,7 @@ async def message_del(request: Request):
     message_model = MessageModel()
 
     if message_id:
-        message_model.delete_message(message_id)
+        message_model.delete(message_id)
         return ResponseModel(
             code=0,
             msg="消息删除成功"
