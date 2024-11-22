@@ -28,11 +28,9 @@ async def history_form(request: Request):
 # 搜索历史记录
 @router.post("/history/search")
 @login_required
-async def history_search(request: Request, page: int = 1, limit: int = 10, agent_id: int = None):
+async def history_search(request: Request, page: int = 1, limit: int = 10):
     history_model = HistoryModel()
     conditions = {}
-    if agent_id:
-        conditions["agent_id"] = agent_id
     paginated_data = history_model.get_paginated(page=page, per_page=limit, conditions=conditions)
     return ResponseModel(
         code=0,

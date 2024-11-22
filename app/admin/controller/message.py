@@ -29,11 +29,9 @@ async def message_form(request: Request):
 # 搜索消息
 @router.post("/message/search")
 @login_required
-async def message_search(request: Request, page: int = 1, limit: int = 10, history_id: Optional[int] = None):
+async def message_search(request: Request, page: int = 1, limit: int = 10):
     message_model = MessageModel()
     conditions = {}
-    if history_id:
-        conditions["history_id"] = history_id
     paginated_data = message_model.get_paginated(page=page, per_page=limit, conditions=conditions)
 
     return ResponseModel(
