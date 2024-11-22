@@ -6,6 +6,18 @@ from models.KnowledgeContentModel import KnowledgeContentModel
 
 router = APIRouter()
 
+# 知识库列表页面
+@router.get("/knowledgecontent")
+@login_required
+async def knowledgecontent_list(request: Request):
+    return templates.TemplateResponse("knowledgecontent.html", {"request": request})
+
+# 知识库表单页面
+@router.get("/knowledgecontent_form")
+@login_required
+async def knowledgecontent_form(request: Request):
+    return templates.TemplateResponse("knowledgecontent_form.html", {"request": request})
+
 # 知识库内容 - 搜索
 @router.post("/knowledgecontent/search")
 @login_required
