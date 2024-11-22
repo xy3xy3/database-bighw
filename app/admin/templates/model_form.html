@@ -1,0 +1,12 @@
+{% extends 'form_base.html' %}
+{% block title %} 模型管理-表单 {% endblock %}
+{% block content %}
+    {% from 'form_macros.html' import input_field, select_field %}
+    {{ input_field('模型名称', 'name', '请输入模型名称', required=True) }}
+    {{ input_field('基础URL', 'base_url', '请输入基础URL', required=True) }}
+    {{ input_field('API密钥', 'api_key', '请输入API密钥', required=True) }}
+    {{ select_field('类型', 'type', [
+        {'value': '0', 'label': 'embedding'},
+        {'value': '1', 'label': 'chat'}
+    ], required=True) }}
+{% endblock %}

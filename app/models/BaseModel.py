@@ -54,7 +54,7 @@ class BaseModel:
             sql += f" LIMIT {limit}"
         if offset:
             sql += f" OFFSET {offset}"
-        print(sql)
+        print("Executing SQL:", sql)  # 输出拼接后的 SQL
         self.cursor.execute(sql, conditions)
         return self.cursor.fetchall()
 

@@ -100,11 +100,6 @@
           }
           table.set({
             method: "post",
-            contentType: "application/json;charset=UTF-8",
-            dataType: "json",
-            headers: {
-              access_token: layui.data(setter.tableName)[request.tokenName],
-            },
           });
 
           table.render(window.config.table);

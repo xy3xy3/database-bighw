@@ -52,11 +52,20 @@ def init_db():
             content TEXT
         );
     """)
-
+    # 创建model表
+    cursor.execute("""
+    CREATE TABLE model (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    base_url VARCHAR(255) NOT NULL,
+    api_key VARCHAR(255) NOT NULL,
+    type INT NOT NULL
+    );  
+    """)                             
     # 其他表的创建语句...
     # 创建 Config 表
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS "Config" (
+        CREATE TABLE IF NOT EXISTS "config" (
             k VARCHAR(255) PRIMARY KEY,
             v TEXT
         );
@@ -64,7 +73,7 @@ def init_db():
 
     # Config设置默认admin_user,admin_pwd
     cursor.execute("""
-        INSERT INTO "Config" (k, v) VALUES ('admin_user', 'admin'), ('admin_pwd', 'admin');
+        INSERT INTO "config" (k, v) VALUES ('admin_user', 'admin'), ('admin_pwd', 'admin');
     """)
     conn.commit()
     cursor.close()
@@ -78,6 +87,8 @@ def reset_db():
     cursor.execute("""
         DROP TABLE IF EXISTS "history";
         DROP TABLE IF EXISTS "message";
+        DROP TABLE IF EXISTS "model";
+        DROP TABLE IF EXISTS "config";
     """)
 
     conn.commit()
