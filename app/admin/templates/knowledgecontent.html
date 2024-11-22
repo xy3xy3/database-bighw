@@ -1,10 +1,7 @@
-{% extends 'table_base.html' %}
-{% block title %} 知识库内容管理 {% endblock %}
-{% block header %}
-{% from 'form_macros.html' import search_field %}
-{{ search_field('关键词', 'keyword', '请输入内容关键词') }}
-{% endblock %}
-{% block extra_js %}
+{% extends 'table_base.html' %} {% block title %} 知识库内容管理 {% endblock %}
+{% block header %} {% from 'form_macros.html' import search_field %} {{
+search_field('关键词', 'keyword', '请输入内容关键词') }} {% endblock %} {% block
+extra_js %}
 <script>
   var config = {
     url: "knowledgecontent",
@@ -16,7 +13,14 @@
         [
           { type: "checkbox", fixed: "left" },
           { field: "id", width: 80, title: "ID", sort: true },
-          { field: "base_id", title: "知识库ID", width: 100 },
+          {
+            field: "base_id",
+            title: "知识库",
+            width: 100,
+            templet: function (d) {
+              return {{ mapping | safe }}[d.base_id];
+            },
+          },
           { field: "content", title: "内容", width: 300 },
           { field: "embedding", title: "向量数据", width: 150 },
           {

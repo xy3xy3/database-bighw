@@ -17,7 +17,9 @@ router = APIRouter()
 @router.get("/agent")
 @login_required
 async def agent_list(request: Request):
-    return templates.TemplateResponse("agent.html", {"request": request})
+    model = ModelModel()
+    mapping = model.get_map("id","name")
+    return templates.TemplateResponse("agent.html",  {"request": request,"mapping":mapping})
 
 # Agent表单页面
 @router.get("/agent_form")

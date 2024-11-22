@@ -1,10 +1,7 @@
-{% extends 'table_base.html' %}
-{% block title %} Agent管理 {% endblock %}
-{% block header %}
-  {% from 'form_macros.html' import search_field %}
-  {{ search_field('Agent名称', 'name', '请输入Agent名称') }}
-{% endblock %}
-{% block extra_js %}
+{% extends 'table_base.html' %} {% block title %} Agent管理 {% endblock %} {%
+block header %} {% from 'form_macros.html' import search_field %} {{
+search_field('Agent名称', 'name', '请输入Agent名称') }} {% endblock %} {% block
+extra_js %}
 <script>
   var config = {
     url: "agent",
@@ -20,12 +17,26 @@
           { field: "base_ids", title: "知识库IDs", width: 200 },
           { field: "max_ref", title: "引用上限", width: 100 },
           { field: "min_cor", title: "相关度下限", width: 100 },
-          { field: "q_model_id", title: "问题模型ID", width: 100 },
-          { field: "a_model_id", title: "答案模型ID", width: 100 },
+          {
+            field: "q_model_id",
+            title: "问题模型",
+            width: 100,
+            templet: function (d) {
+              return {{ mapping | safe }}[d.q_model_id];
+            },
+          },
+          {
+            field: "a_model_id",
+            title: "答案模型",
+            width: 100,
+            templet: function (d) {
+              return {{ mapping | safe }}[d.a_model_id];
+            },
+          },
           { field: "a_prompt", title: "答案提示", width: 200 },
           {
             title: "操作",
-            minWidth: 150,
+            minWidth: 300,
             align: "center",
             fixed: "right",
             toolbar: "#table-action-list",
