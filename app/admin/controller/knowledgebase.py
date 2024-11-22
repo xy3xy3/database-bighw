@@ -1,4 +1,4 @@
-# File: app\admin\controller\knowledgebase.py
+# 修复后的 app\admin\controller\knowledgebase.py
 from typing import Optional
 from fastapi import APIRouter, Request, Form
 from fastapi.templating import Jinja2Templates
@@ -60,10 +60,20 @@ async def knowledgebase_save(request: Request):
     model_id = int(form_data.get("model_id", 0))
 
     if knowledgebase_id:
-        knowledgebase_model.update(knowledgebase_id, name=name, description=description, model_id=model_id)
+        data = {
+            "name": name,
+            "description": description,
+            "model_id": model_id
+        }
+        knowledgebase_model.update(knowledgebase_id,data)
         msg = "知识库更新成功"
     else:
-        knowledgebase_model.create(name, description, model_id)
+        data = {
+            "name": name,
+            "description": description,
+            "model_id": model_id
+        }
+        knowledgebase_model.save(data)
         msg = "知识库创建成功"
 
     return ResponseModel(

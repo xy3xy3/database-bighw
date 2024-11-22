@@ -71,8 +71,7 @@ def init_db():
         id SERIAL PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         description TEXT NOT NULL,
-        model_id INT NOT NULL,
-        FOREIGN KEY (model_id) REFERENCES model(id)
+        model_id INT NOT NULL
     );  
     """)
 
