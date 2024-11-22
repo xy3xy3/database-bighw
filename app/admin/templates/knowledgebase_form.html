@@ -3,7 +3,7 @@
 {% block content %}
     {% from 'form_macros.html' import input_field, textarea_field, select_field %}
     {{ input_field('知识库名称', 'name', '请输入知识库名称', required=True) }}
-    {{ textarea_field('介绍', 'desc', '请输入知识库介绍', required=True) }}
+    {{ textarea_field('介绍', 'description', '请输入知识库介绍', required=True) }}
     {{ select_field('向量模型', 'model_id', [
         {'value': '1', 'label': '模型1'},
         {'value': '2', 'label': '模型2'}

@@ -56,14 +56,14 @@ async def knowledgebase_save(request: Request):
     if knowledgebase_id:
         knowledgebase_id = int(knowledgebase_id)
     name = form_data.get("name")
-    desc = form_data.get("desc")
+    description = form_data.get("description")
     model_id = int(form_data.get("model_id", 0))
 
     if knowledgebase_id:
-        knowledgebase_model.update(knowledgebase_id, name=name, desc=desc, model_id=model_id)
+        knowledgebase_model.update(knowledgebase_id, name=name, description=description, model_id=model_id)
         msg = "知识库更新成功"
     else:
-        knowledgebase_model.create(name, desc, model_id)
+        knowledgebase_model.create(name, description, model_id)
         msg = "知识库创建成功"
 
     return ResponseModel(

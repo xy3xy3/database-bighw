@@ -70,7 +70,7 @@ def init_db():
     CREATE TABLE IF NOT EXISTS knowledgebase (
         id SERIAL PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
-        desc TEXT NOT NULL,
+        description TEXT NOT NULL,
         model_id INT NOT NULL,
         FOREIGN KEY (model_id) REFERENCES model(id)
     );  
@@ -99,8 +99,9 @@ def reset_db():
 
     # 删除所有表（按依赖关系删除）
     cursor.execute("""
-        DROP TABLE IF EXISTS "history";
         DROP TABLE IF EXISTS "message";
+        DROP TABLE IF EXISTS "knowledgebase";
+        DROP TABLE IF EXISTS "history";
         DROP TABLE IF EXISTS "model";
         DROP TABLE IF EXISTS "config";
     """)
