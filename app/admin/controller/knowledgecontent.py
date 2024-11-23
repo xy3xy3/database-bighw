@@ -1,7 +1,10 @@
+from datetime import datetime
 from fastapi import APIRouter, Request, Form
 from typing import Optional
 from admin.utils.commonModel import ResponseModel
 from admin.utils.decorators import login_required
+from utils import list_to_vector
+from tools.ai import ai
 from models.KnowledgeContentModel import KnowledgeContentModel
 from models.KnowledgeBaseModel import KnowledgeBaseModel
 from fastapi.templating import Jinja2Templates
@@ -58,20 +61,28 @@ async def knowledgecontent_search(
 async def knowledgecontent_save(request: Request):
     form_data = await request.form()
     model = KnowledgeContentModel()
-
+    knowledegebase_model = KnowledgeBaseModel()
     content_id = form_data.get("id")
     if content_id:
         content_id = int(content_id)
-    base_id = form_data.get("base_id")
-    content = form_data.get("content")
-    embedding = form_data.get("embedding")
+    base_id = int(form_data.get("base_id"))
+    embedding_model =knowledegebase_model.get_model_details_by_base_id(base_id)
+    if not embedding_model:
+        return ResponseModel(code=1, msg="模型配置错误")
 
+    content = form_data.get("content")
+    aiApi = ai(embedding_model['api_key'],embedding_model['base_url'])
+    embedding = await aiApi.embedding(embedding_model['model'],content)
     if content_id:
-        data = {"base_id": base_id, "content": content, "embedding": embedding}
+        data = {"base_id": base_id, "content": content,
+            "embedding": list_to_vector(embedding),
+            "created_at": datetime.now()}
         model.update(content_id, data)
         msg = "知识库内容更新成功"
     else:
-        data = {"base_id": base_id, "content": content, "embedding": embedding}
+        data = {"base_id": base_id, "content": content,
+            "embedding": list_to_vector(embedding),
+            "created_at": datetime.now()}
         model.save(data)
         msg = "知识库内容创建成功"
 

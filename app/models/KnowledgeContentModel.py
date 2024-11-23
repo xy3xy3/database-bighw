@@ -17,7 +17,7 @@ class KnowledgeContentModel(BaseModel):
             "base_id": base_id,
             "content": content,
             "embedding": list_to_vector(embedding),
-            "created_at": datetime.now()  # 自动填写 created_at 字段
+            "created_at": datetime.now()
         }
         return self.save(data)
 
