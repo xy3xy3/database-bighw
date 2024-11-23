@@ -1,3 +1,8 @@
+https://www.modb.pro/db/1794989652700631040
+授予权限
+```
+GRANT USAGE ON EXTENSION datavec TO user1;
+```
 dataVec向量数据库测试
 1.创建一个有三维向量的表
 CREATE TABLE items (id bigserial PRIMARY KEY, embedding vector(3));

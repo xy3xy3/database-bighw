@@ -72,7 +72,7 @@ def init_db():
             base_url VARCHAR(255) NOT NULL,
             api_key VARCHAR(255) NOT NULL,
             model_type INT NOT NULL
-        );  
+        );
     """)
 
     # 创建 knowledgebase 表，添加外键依赖 model 表
@@ -83,7 +83,7 @@ def init_db():
             name VARCHAR(255) NOT NULL,
             description TEXT NOT NULL,
             model_id INT REFERENCES model(id) ON DELETE CASCADE
-        );  
+        );
     """)
 
     # 创建 knowledge_content 表，添加外键依赖 knowledgebase 表
@@ -93,7 +93,7 @@ def init_db():
             id SERIAL PRIMARY KEY,
             base_id INT REFERENCES knowledgebase(id) ON DELETE CASCADE,
             content TEXT NOT NULL,
-            embedding JSONB,
+            embedding vector(2048),
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );

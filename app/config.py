@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     db_user: str = "gaussdb"
     db_password: str = "OGSql@123"
     db_name: str = "postgres"
-    db_schema: str = "public"
+    db_schema: str = "gaussdb"
 
     class Config:
         env_file = ".env"  # 如果需要从环境变量文件中读取配置
