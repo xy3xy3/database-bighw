@@ -3,6 +3,7 @@ import os
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from admin.router import admin_router
+from test.router import test_router
 # from home.router import home_router
 from middleware.auth import AdminAuthMiddleware
 from utils import *  # 用于密码哈希等
@@ -13,7 +14,7 @@ from contextlib import asynccontextmanager
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # 启动时执行的操作
-    test = 1
+    test = 0
     if test:
         reset_db()
         init_db()
@@ -34,6 +35,10 @@ ADMIN_STATIC_DIR = os.path.join(BASE_DIR, "app", "admin", "static")
 app.mount("/admin/static", StaticFiles(directory=ADMIN_STATIC_DIR), name="admin_static")
 
 app.mount("/admin", admin_app)
+
+test_app = FastAPI()
+test_app.include_router(test_router)
+app.mount("/test", test_app)
 
 # home_app = FastAPI()
 # home_app.include_router(home_router)

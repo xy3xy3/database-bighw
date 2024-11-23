@@ -94,8 +94,7 @@ def init_db():
             base_id INT REFERENCES knowledgebase(id) ON DELETE CASCADE,
             content TEXT NOT NULL,
             embedding vector(2048),
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
     """)
 
