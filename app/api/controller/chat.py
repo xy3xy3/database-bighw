@@ -4,6 +4,8 @@ from fastapi.responses import StreamingResponse, JSONResponse
 from pydantic import BaseModel
 from typing import List, Optional, Union
 import asyncio
+from models.KnowledgeContentModel import KnowledgeContentModel
+from models import KnowledgeBaseModel
 from models.AgentModel import AgentModel
 from tools.ai import ai
 import time
@@ -53,7 +55,9 @@ async def chat_endpoint(request: ChatRequest):
     agent = agent_model.get_agent_by_id(int(request.model))
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")
-
+    
+ 
+        
     # 这里只使用对话模型 (a_model)
     a_model = agent['a_model']
     if a_model['type'] != 1:
@@ -61,7 +65,10 @@ async def chat_endpoint(request: ChatRequest):
 
     # 初始化 AI 客户端
     ai_client = ai(api_key=a_model['api_key'], base_url=a_model['base_url'])
-
+    # 搜索消息
+    questions = []
+    # 知识集合
+    knowledges = []
     # 准备消息
     messages = []
     for msg in request.messages:
@@ -70,7 +77,13 @@ async def chat_endpoint(request: ChatRequest):
             messages.append({"role": msg.role, "content": combined_text})
         else:
             messages.append({"role": msg.role, "content": msg.content})
-
+   # 获取知识库 用,隔开
+    base_ids = agent['base_ids'].split(",")
+    if len(base_ids) > 0:
+        # 暂时只实现单一知识库关联
+        question = messages[-1]['content']
+        questions = [question]
+        knowledges = await get_knowledges(base_ids,questions)
     if request.stream:
         try:
             async def event_generator():
@@ -115,3 +128,23 @@ async def chat_endpoint(request: ChatRequest):
             return JSONResponse(content=openai_response.dict())
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
+
+
+async def get_knowledges(base_ids:list, questions:str)->list:
+    # TODO:进一步并行 优化查询速度
+    base_model = KnowledgeBaseModel()
+    content_model = KnowledgeContentModel()
+    embedding_model = base_model.get_model_details_by_base_id(base_ids[0])
+    embedApi = ai(embedding_model['api_key'],embedding_model['base_url'])
+    embedding_list = []
+    # 得到多个问题的embedding
+    for question in questions:
+        embedding = await embedApi.embedding(embedding_model['model'],question)
+        embedding_list.append(embedding)
+    # 对每个base_id，用每个embedding去搜索
+    res = []
+    for base_id in base_ids:
+        for embedding in embedding_list:
+            contents = await content_model.get_nearest_neighbors(embedding,base_id=base_id)
+            res.extend(contents)
+    return res

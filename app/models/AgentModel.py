@@ -40,12 +40,12 @@ class AgentModel(BaseModel):
         agent = self.get_by_id(id)
         if not agent:
             return None
-
+            
         # 获取问题优化模型信息
         q_model = self.model_model.get_model_by_id(agent['q_model_id'])
         if not q_model:
             raise ValueError("问题优化模型未找到")
-
+        
         # 获取对话模型信息
         a_model = self.model_model.get_model_by_id(agent['a_model_id'])
         if not a_model:
