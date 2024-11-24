@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from typing import List, Optional, Union
 import asyncio
 from models.KnowledgeContentModel import KnowledgeContentModel
-from models import KnowledgeBaseModel
+from models.KnowledgeBaseModel import KnowledgeBaseModel
 from models.AgentModel import AgentModel
 from tools.ai import ai
 import time
