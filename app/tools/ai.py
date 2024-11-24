@@ -3,14 +3,20 @@ import re
 from openai import AsyncOpenAI
 from tools.jsonHelper import try_parse_json_object  # 引入 try_parse_json_object
 
+
 class ai:
+
     def __init__(self, api_key: str, base_url: str):
         self.client = AsyncOpenAI(
             api_key=api_key,
             base_url=base_url,
         )
 
-    async def extract_json(self, model: str, system_prompt: str, user_prompt: str,history: list = None) -> dict:
+    async def extract_json(self,
+                           model: str,
+                           system_prompt: str,
+                           user_prompt: str,
+                           history: list = None) -> dict:
         """
         使用 AI 模型提取 JSON 对象。
 
@@ -22,8 +28,14 @@ class ai:
         try:
             # 包装消息
             messages = [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
+                {
+                    "role": "system",
+                    "content": system_prompt
+                },
+                {
+                    "role": "user",
+                    "content": user_prompt
+                },
             ]
 
             # 调用 OpenAI 接口
@@ -31,7 +43,7 @@ class ai:
                 messages=messages,
                 model=model,
                 stream=False,
-            )
+                response_format={'type': 'json_object'})
 
             # 提取内容
             content = response.choices[0].message.content
@@ -43,8 +55,8 @@ class ai:
                 json_str = match.group(1).strip()
             else:
                 json_str = content
-            print(type(json_str))
-            
+            print(type(json_str), json_str)
+
             json_info, json_obj = try_parse_json_object(json_str)
             if json_obj:  # 如果解析成功
                 return json_obj
@@ -55,6 +67,7 @@ class ai:
         except Exception as e:
             logging.error(f"Error during JSON extraction: {e}")
             return None
+
     async def embedding(self, model: str, text: str) -> list:
         """生成文本嵌入"""
         try:
@@ -82,13 +95,15 @@ class ai:
                     async for chunk in res:
                         try:
                             # 检查 delta 是否为对象或者字典
-                            delta = getattr(chunk.choices[0].delta, 'content', '') if hasattr(chunk.choices[0].delta, 'content') else ''
+                            delta = getattr(chunk.choices[0].delta, 'content',
+                                            '') if hasattr(
+                                                chunk.choices[0].delta,
+                                                'content') else ''
                             if delta:  # 如果有新内容，返回
                                 yield delta
                         except Exception as e:
                             print(f"Error processing chunk: {e}")
                             continue
-
 
                 return stream_responses()
             else:
@@ -97,6 +112,8 @@ class ai:
         except Exception as e:
             print(f"Error during chat: {e}")
             return None
+
+
 # 测试代码
 async def test():
     key = "7305f8f725fd64362176a8cc68f1d909.fHTbqG2ArlpGP901"
@@ -141,6 +158,7 @@ EXAMPLE JSON OUTPUT:
 
     result = await aiApi.extract_json(model, system_prompt, user_prompt)
     print("提取的 JSON 对象:", result)
+
 
 if __name__ == "__main__":
     import asyncio

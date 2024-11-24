@@ -131,7 +131,7 @@ def init_db():
         INSERT INTO model (name, base_url, api_key, model_type)
         VALUES
             ('embedding-3', 'https://open.bigmodel.cn/api/paas/v4', '7305f8f725fd64362176a8cc68f1d909.fHTbqG2ArlpGP901', 0),
-            ('glm-4-flash', 'https://open.bigmodel.cn/api/paas/v4', '7305f8f725fd64362176a8cc68f1d909.fHTbqG2ArlpGP901', 1),
+            ('deepseek-chat', 'https://api.deepseek.com', 'sk-19810a0dceaf405cbb5caafd3842f0b6', 1),
             ('glm-4-long', 'https://open.bigmodel.cn/api/paas/v4', '7305f8f725fd64362176a8cc68f1d909.fHTbqG2ArlpGP901', 1);
         """)
 
