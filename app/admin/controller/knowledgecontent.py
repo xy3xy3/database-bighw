@@ -45,6 +45,7 @@ async def knowledgecontent_import_post(
     over_leap: int = Form(...),
     file_path: Optional[str] = Form(None),
 ): 
+    print(f"min_token: {min_token}, over_leap: {over_leap}, file_path: {file_path}")
     pass
 
 @router.post("/knowledgecontent_upload")

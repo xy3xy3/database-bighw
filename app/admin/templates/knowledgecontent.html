@@ -50,9 +50,10 @@ body_button %}
     .config({
       base: "/admin/static/", // 静态资源所在路径
     })
-    .use([], function () {
+    .use(["laydate", "index", "table", "laytpl", "admin"], function () {
       var form = layui.form,
         laytpl = layui.laytpl,
+        admin = layui.admin,
         $ = layui.$;
       var active = {
         import: function () {
@@ -61,6 +62,7 @@ body_button %}
             title: "导入文件",
             content: "/admin/knowledgecontent_import",
             area: ["550px", "550px"],
+            btn: ["确定", "取消"],
             yes: function (index, layero) {
               var iframeWindow = window["layui-layer-iframe" + index],
                 submitID = "LAY-user-front-submit",
