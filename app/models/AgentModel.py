@@ -1,6 +1,6 @@
 from models.BaseModel import BaseModel
-from app.models.ModelModel import ModelModel
-from app.models.KnowledgeBaseModel import KnowledgeBaseModel
+from models.ModelModel import ModelModel
+from models.KnowledgeBaseModel import KnowledgeBaseModel
 
 class AgentModel(BaseModel):
     table_name = "agent"

@@ -4,8 +4,8 @@ from fastapi.responses import StreamingResponse, JSONResponse
 from pydantic import BaseModel
 from typing import List, Optional
 import asyncio
-from app.models.AgentModel import AgentModel
-from app.tools.ai import ai
+from models.AgentModel import AgentModel
+from tools.ai import ai
 import time
 
 router = APIRouter()
