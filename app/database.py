@@ -131,7 +131,7 @@ def init_db():
         INSERT INTO model (name, base_url, api_key, model_type)
         VALUES
             ('embedding-3', 'https://open.bigmodel.cn/api/paas/v4', '7305f8f725fd64362176a8cc68f1d909.fHTbqG2ArlpGP901', 0),
-            ('glm-4-flash', 'https://open.bigmodel.cn/api/paas/v4', '7305f8f725fd64362176a8cc68f1d909.fHTbqG2ArlpGP901', 1),
+            ('deepseek-chat', 'https://api.deepseek.com', 'sk-19810a0dceaf405cbb5caafd3842f0b6', 1),
             ('glm-4-long', 'https://open.bigmodel.cn/api/paas/v4', '7305f8f725fd64362176a8cc68f1d909.fHTbqG2ArlpGP901', 1);
         """)
 
@@ -146,7 +146,7 @@ def init_db():
     cursor.execute("""
         INSERT INTO agent (name, base_ids, top_n, q_model_id, q_prompt, a_model_id, a_prompt)
         VALUES
-            ('中山大学助手', '1', 100, 1, '1', 2, '1');
+            ('中山大学助手', '1', 100, 2, '问题关于中山大学', 3, '回答关于中山大学问题');
     """)
 
     # Config设置默认admin_user,admin_pwd

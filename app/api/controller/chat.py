@@ -56,14 +56,13 @@ async def chat_endpoint(request: ChatRequest):
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")
     top_n = agent['top_n']
- 
-    # 这里只使用对话模型 (a_model)
+    #  对话模型
     a_model = agent['a_model']
     if a_model['type'] != 1:
         raise HTTPException(status_code=400, detail="指定的模型不是对话模型")
 
     # 初始化 AI 客户端
-    ai_client = ai(api_key=a_model['api_key'], base_url=a_model['base_url'])
+    chat_client = ai(api_key=a_model['api_key'], base_url=a_model['base_url'])
     # 搜索消息
     questions = []
     # 知识集合
@@ -76,20 +75,42 @@ async def chat_endpoint(request: ChatRequest):
             messages.append({"role": msg.role, "content": combined_text})
         else:
             messages.append({"role": msg.role, "content": msg.content})
-   # 获取知识库 用,隔开
+            
+    # 问题优化模型
+    q_model = agent['q_model']
+    print(q_model)
+    if q_model['type'] != 1:
+        raise HTTPException(status_code=400, detail="指定的模型不是问题优化模型")
+    q_client = ai(api_key=q_model['api_key'], base_url=q_model['base_url'])
+    q_prompt = agent['q_prompt']
+    questions = await questions_optimization(
+        client=q_client,
+        model=q_model['name'],
+        messages=messages
+    )
+    origin_question = messages[-1]['content']
+    if isinstance(questions, list):
+        questions = [item['question'] for item in questions]
+    elif isinstance(questions, dict):
+        extern_question = questions['question']
+        questions = [
+            extern_question,
+            origin_question
+        ]
+    else:
+        questions = [origin_question]
+        
     base_ids = agent['base_ids'].split(",")
+    a_prompt = agent['a_prompt']
     if len(base_ids) > 0:
-        # 暂时只实现单一知识库关联
-        question = messages[-1]['content']
-        questions = [question]
         knowledges = await get_knowledges(base_ids,questions,top_n)
         knowledges_text = "\n\n".join(knowledges)
-        messages[-1]['content'] = f"使用下面<data></data>的知识辅助回答问题" \
-        f"<data>{knowledges_text}</data>\n用户问题:\n'''{question}'''"
+        messages[-1]['content'] = f"{a_prompt}\n\n使用下面<data></data>的知识辅助回答问题" \
+        f"<data>{knowledges_text}</data>\n用户问题:\n'''{origin_question}'''"
     if request.stream:
         try:
             async def event_generator():
-                async for chunk in (await ai_client.chat(model=a_model['name'], messages=messages, stream=True)):
+                async for chunk in (await chat_client.chat(model=a_model['name'], messages=messages, stream=True)):
                     delta_content = {"content": chunk}  # 修复解析逻辑
                     response = {
                         "id": f"chatcmpl-{int(time.time())}",
@@ -109,7 +130,7 @@ async def chat_endpoint(request: ChatRequest):
             raise HTTPException(status_code=500, detail=str(e))
     else:
         try:
-            response = await ai_client.chat(model=a_model['name'], messages=messages, stream=False)
+            response = await chat_client.chat(model=a_model['name'], messages=messages, stream=False)
             # 构造 OpenAI 格式的响应
             openai_response = ChatCompletionResponse(
                 id=f"chatcmpl-{int(time.time())}",
@@ -130,8 +151,63 @@ async def chat_endpoint(request: ChatRequest):
             return JSONResponse(content=openai_response.dict())
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
+        
+# 根据历史消息，获取优化后的问题集合
+async def questions_optimization(client:ai,model:str, messages: list,q_prompt:str=None) -> list:
+    system_prompt = f"""接下来请帮忙对问题扩展，扩展问题到1-3个，便于知识库搜索。如果用户消息带有历史记录，你需要帮忙做指代消除。
+背景知识：{q_prompt}"""+"""
+案例
+EXAMPLE INPUT: 
+中山大学在哪
+EXAMPLE JSON OUTPUT:
+```
+[
+    {
+        "question": "中山大学地理位置"
+    },
+    {
+        "question": "怎么去中山大学"
+    },
+    {
+        "question": "中山大学往哪走"
+    }
+]
+```
+EXAMPLE INPUT: 
+history:
+中山大学校长是谁
+output:
+是高松
+current:
+他年级多大
+EXAMPLE JSON OUTPUT:
+```
+[
+    {
+        "question": "中山大学校长年级多大"
+    },
+    {
+        "question": "高松年级多大"
+    }
+]
+```
+EXAMPLE INPUT: 
+分数线
+EXAMPLE JSON OUTPUT:
+```
+[
+    {
+        "question": "分数线是多少"
+    }
+]
+```
+"""
+    user_prompt = messages[-1]['content']
+    history = messages[:-1]
+    result = await client.extract_json(model, system_prompt, user_prompt, history)
+    return result
 
-
+# 根据知识库ids和问题集合查找符合要求的n个答案
 async def get_knowledges(base_ids: list, questions: list, top_n: int) -> list:
     # TODO:进一步并行 优化查询速度
     base_model = KnowledgeBaseModel()
