@@ -15,7 +15,7 @@ class Message(BaseModel):
     content: str
 
 class ChatRequest(BaseModel):
-    model: int  # 使用 Agent 的 ID
+    model: str
     messages: List[Message]
     stream: Optional[bool] = False
 
@@ -43,7 +43,7 @@ class ChatCompletionResponse(BaseModel):
 @router.post("/chat")
 async def chat_endpoint(request: ChatRequest):
     agent_model = AgentModel()
-    agent = agent_model.get_agent_by_id(request.model)
+    agent = agent_model.get_agent_by_id(int(request.model))
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")
 
