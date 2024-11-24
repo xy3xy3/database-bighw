@@ -58,7 +58,7 @@ async def knowledgecontent_import_post(
     
     return ResponseModel(code=0, msg="成功")
 
-async def split_markdown_file(file_path: str, max_len: int, over_leap: int) -> List[str]:
+def split_markdown_file(file_path: str, max_len: int, over_leap: int) -> List[str]:
     """
     根据给定的文件路径、最大长度和重叠量，拆分 Markdown 文件内容。
 
@@ -80,23 +80,24 @@ async def split_markdown_file(file_path: str, max_len: int, over_leap: int) -> L
 
 async def process_import_task(base_id:int,max_len: int, over_leap: int, file_path: Optional[str]):
     knowledegebase_model = KnowledgeBaseModel()
+    content_model = KnowledgeContentModel()
     embedding_model =knowledegebase_model.get_model_details_by_base_id(base_id)
     # 调用切割函数获取拆分后的文本列表
     if file_path:
         res = split_markdown_file(file_path, max_len, over_leap)
     else:
         res = []
-        
+    print(res)
     aiApi = ai(embedding_model['api_key'],embedding_model['base_url'])
-    model_name = embedding_model['model_name']
+    model_name = embedding_model['model']
     for context in res:
-        embedding = await aiApi.get_embedding(model_name, context)
+        embedding = await aiApi.embedding(model_name, context)
         data = {
             "base_id": base_id,
             "content": context,
             "embedding": embedding,
         }
-        knowledegebase_model.save(data)
+        content_model.save(data)
     print("Import task completed")
 
 @router.post("/knowledgecontent_upload")

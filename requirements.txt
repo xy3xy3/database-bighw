@@ -8,3 +8,7 @@ jinja2
 python-multipart
 openai
 json_repair
+tiktoken
+langchain
+langchain-community
+"unstructured[md]" nltk
