@@ -10,27 +10,6 @@ class AgentModel(BaseModel):
         self.model_model = ModelModel()
         self.knowledge_base_model = KnowledgeBaseModel()
 
-    def create_agent(self, name: str, base_ids: str, max_ref: int, min_cor: float,
-                    q_model_id: int, q_prompt: str, a_model_id: int, a_prompt: str):
-        """创建新的Agent"""
-        data = {
-            "name": name,
-            "base_ids": base_ids,
-            "max_ref": max_ref,
-            "min_cor": min_cor,
-            "q_model_id": q_model_id,
-            "q_prompt": q_prompt,
-            "a_model_id": a_model_id,
-            "a_prompt": a_prompt,
-        }
-        return self.save(data)
-
-    def update_agent(self, id: int, **kwargs):
-        """更新Agent"""
-        if not kwargs:
-            raise ValueError("必须提供要更新的字段")
-        return self.update(id, kwargs)
-
     def delete_agent(self, id: int):
         """删除Agent"""
         return self.delete(id)
@@ -40,12 +19,12 @@ class AgentModel(BaseModel):
         agent = self.get_by_id(id)
         if not agent:
             return None
-
+            
         # 获取问题优化模型信息
         q_model = self.model_model.get_model_by_id(agent['q_model_id'])
         if not q_model:
             raise ValueError("问题优化模型未找到")
-
+        
         # 获取对话模型信息
         a_model = self.model_model.get_model_by_id(agent['a_model_id'])
         if not a_model:
