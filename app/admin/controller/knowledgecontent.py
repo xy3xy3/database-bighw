@@ -39,7 +39,9 @@ async def knowledgecontent_form(request: Request):
 @router.get("/knowledgecontent_import")
 @login_required
 async def knowledgecontent_import(request: Request):
-    return templates.TemplateResponse("knowledgecontent_import.html", {"request": request})
+    knowledgebase_model = KnowledgeBaseModel()  # 实例化知识库数据访问对象
+    knowledgebases = knowledgebase_model.get_options_list("id", "name")  # 获取知识库列表
+    return templates.TemplateResponse("knowledgecontent_import.html", {"request": request, "knowledgebases": knowledgebases})
 @router.post("/knowledgecontent_import")
 @login_required
 async def knowledgecontent_import_post(

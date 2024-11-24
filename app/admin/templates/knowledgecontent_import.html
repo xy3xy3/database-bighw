@@ -10,6 +10,10 @@
 
 <body>
     <div class="layui-form" lay-filter="layuiadmin-form" id="layuiadmin-form" style="padding: 20px 0 0 0">
+        
+        {% from 'form_macros.html' import input_field, textarea_field, select_field %}
+        
+        {{ select_field('知识库', 'base_id', options=knowledgebases, required=True) }}
         <div class="layui-form-item">
             <label class="layui-form-label">最小分割</label>
             <div class="layui-input-inline">
