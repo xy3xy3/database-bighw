@@ -48,7 +48,6 @@ class ChatCompletionResponse(BaseModel):
     usage: Usage
 
 @router.post("/chat/completions")
-@router.post("/chat/completions")
 async def chat_endpoint(request: ChatRequest):
     agent_model = AgentModel()
     agent = agent_model.get_agent_by_id(int(request.model))
