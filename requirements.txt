@@ -12,3 +12,4 @@ tiktoken
 langchain
 langchain-community
 nltk
+unstructured[md]
