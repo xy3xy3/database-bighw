@@ -132,20 +132,22 @@ async def chat_endpoint(request: ChatRequest):
             raise HTTPException(status_code=500, detail=str(e))
 
 
-async def get_knowledges(base_ids:list, questions:list,top_n:int)->list:
+async def get_knowledges(base_ids: list, questions: list, top_n: int) -> list:
     # TODO:进一步并行 优化查询速度
     base_model = KnowledgeBaseModel()
     content_model = KnowledgeContentModel()
     embedding_model = base_model.get_model_details_by_base_id(base_ids[0])
-    embedApi = ai(embedding_model['api_key'],embedding_model['base_url'])
+    embedApi = ai(embedding_model['api_key'], embedding_model['base_url'])
     embedding_list = []
     # 得到多个问题的embedding
     for question in questions:
-        embedding = await embedApi.embedding(embedding_model['model'],question)
+        embedding = await embedApi.embedding(embedding_model['model'], question)
         embedding_list.append(embedding)
     # 对每个base_id，用每个embedding去搜索
     res = []
     for embedding in embedding_list:
-        contents = content_model.get_nearest_neighbors(embedding,top_n=top_n,base_ids=base_ids)
+        contents = content_model.get_nearest_neighbors(embedding, top_n=top_n, base_ids=base_ids)
+        # 确保 contents 中的每个元素都是字符串类型
+        contents = [content['content'] for content in contents]
         res.extend(contents)
     return res
