@@ -143,8 +143,7 @@ async def get_knowledges(base_ids:list, questions:str)->list:
         embedding_list.append(embedding)
     # 对每个base_id，用每个embedding去搜索
     res = []
-    for base_id in base_ids:
-        for embedding in embedding_list:
-            contents = await content_model.get_nearest_neighbors(embedding,base_id=base_id)
-            res.extend(contents)
+    for embedding in embedding_list:
+        contents = await content_model.get_nearest_neighbors(embedding,base_ids=base_ids)
+        res.extend(contents)
     return res

@@ -56,22 +56,27 @@ async def agent_save(request: Request):
         agent_id = int(agent_id)
     name = form_data.get("name")
     base_ids = form_data.get("base_ids")
-    max_ref = int(form_data.get("max_ref"))
-    min_cor = float(form_data.get("min_cor"))
+    top_n = int(form_data.get("top_n"))
     q_model_id = int(form_data.get("q_model_id"))
     q_prompt = form_data.get("q_prompt")
     a_model_id = int(form_data.get("a_model_id"))
     a_prompt = form_data.get("a_prompt")
 
+    data = {
+        "name": name,
+        "base_ids": base_ids,
+        "top_n": top_n,
+        "q_model_id": q_model_id,
+        "q_prompt": q_prompt,
+        "a_model_id": a_model_id,
+        "a_prompt": a_prompt
+    }
+
     if agent_id:
-        agent_model.update_agent(agent_id, name=name, base_ids=base_ids, max_ref=max_ref,
-                                 min_cor=min_cor, q_model_id=q_model_id, q_prompt=q_prompt,
-                                 a_model_id=a_model_id, a_prompt=a_prompt)
+        agent_model.update(agent_id, data)
         msg = "Agent更新成功"
     else:
-        agent_model.create_agent(name=name, base_ids=base_ids, max_ref=max_ref, min_cor=min_cor,
-                                 q_model_id=q_model_id, q_prompt=q_prompt,
-                                 a_model_id=a_model_id, a_prompt=a_prompt)
+        agent_model.save(data)
         msg = "Agent创建成功"
 
     return ResponseModel(
