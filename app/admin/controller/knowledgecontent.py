@@ -44,22 +44,31 @@ async def knowledgecontent_import(request: Request):
 @login_required
 async def knowledgecontent_import_post(
     request: Request,
+    base_id: int = Form(...),
     min_token: int = Form(...),
     over_leap: int = Form(...),
     file_path: Optional[str] = Form(None),
 ):
     # 异步处理导入任务
-    asyncio.create_task(process_import_task(min_token, over_leap, file_path))
+    asyncio.create_task(process_import_task(base_id, min_token, over_leap, file_path))
     
     return ResponseModel(code=0, msg="成功")
 
-async def process_import_task(min_token: int, over_leap: int, file_path: Optional[str]):
-    # 模拟导入任务的异步处理
-    print(f"Starting import task with min_token: {min_token}, over_leap: {over_leap}, file_path: {file_path}")
-    
-    # 这里可以放置真正的导入逻辑
-    await asyncio.sleep(10)  # 模拟长时间运行的任务
-    
+async def process_import_task(base_id:int,min_token: int, over_leap: int, file_path: Optional[str]):
+    knowledegebase_model = KnowledgeBaseModel()
+    embedding_model =knowledegebase_model.get_model_details_by_base_id(base_id)
+    # 假设cjf得到的结果list是res
+    res = []
+    aiApi = ai(embedding_model['api_key'],embedding_model['base_url'])
+    model_name = embedding_model['model_name']
+    for context in res:
+        embedding = await aiApi.get_embedding(model_name, context)
+        data = {
+            "base_id": base_id,
+            "content": context,
+            "embedding": embedding,
+        }
+        knowledegebase_model.save(data)
     print("Import task completed")
 
 @router.post("/knowledgecontent_upload")
