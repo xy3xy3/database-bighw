@@ -85,19 +85,21 @@ async def chat_endpoint(request: ChatRequest):
     questions = await questions_optimization(
         client=q_client,
         model=q_model['name'],
-        messages=request.messages
+        messages=messages
     )
-    if not questions:
-        question = messages[-1]['content']
-        questions = [question]
-    print(questions)
+    origin_question = messages[-1]['content']
+    if questions:
+        questions = [item['question'] for item in questions]
+    else:
+        questions = [origin_question]
+        
     base_ids = agent['base_ids'].split(",")
     if len(base_ids) > 0:
         # 暂时只实现单一知识库关联
         knowledges = await get_knowledges(base_ids,questions,top_n)
         knowledges_text = "\n\n".join(knowledges)
         messages[-1]['content'] = f"使用下面<data></data>的知识辅助回答问题" \
-        f"<data>{knowledges_text}</data>\n用户问题:\n'''{question}'''"
+        f"<data>{knowledges_text}</data>\n用户问题:\n'''{origin_question}'''"
     if request.stream:
         try:
             async def event_generator():
@@ -145,7 +147,7 @@ async def chat_endpoint(request: ChatRequest):
         
 # 根据历史消息，获取优化后的问题集合
 async def questions_optimization(client:ai,model:str, messages: list,q_prompt:str=None) -> list:
-    system_prompt = f"""背景知识：{q_prompt}
+    system_prompt = f"""背景知识：{q_prompt}"""+"""
 请帮忙扩展问题到1-3个，便于知识库搜索。如果用户消息带有历史记录，你需要帮忙做指代消除。
 案例
 EXAMPLE INPUT: 

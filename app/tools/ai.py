@@ -41,9 +41,9 @@ class ai:
 
             if match:
                 json_str = match.group(1).strip()
-                # 调用 try_parse_json_object 解析 JSON
             else:
                 json_str = content
+            print(type(json_str))
             
             json_info, json_obj = try_parse_json_object(json_str)
             if json_obj:  # 如果解析成功
@@ -55,7 +55,48 @@ class ai:
         except Exception as e:
             logging.error(f"Error during JSON extraction: {e}")
             return None
+    async def embedding(self, model: str, text: str) -> list:
+        """生成文本嵌入"""
+        try:
+            embedding = await self.client.embeddings.create(
+                model=model,
+                input=text,
+            )
+            return embedding.data[0].embedding
+        except Exception as e:
+            print(e)
+            return None
 
+    async def chat(self, model: str, messages: list, stream: bool = False):
+        """聊天方法，兼容 OpenAI 风格的 API"""
+        try:
+            res = await self.client.chat.completions.create(
+                messages=messages,
+                model=model,
+                stream=stream,
+            )
+
+            if stream:
+                # 返回一个异步生成器
+                async def stream_responses():
+                    async for chunk in res:
+                        try:
+                            # 检查 delta 是否为对象或者字典
+                            delta = getattr(chunk.choices[0].delta, 'content', '') if hasattr(chunk.choices[0].delta, 'content') else ''
+                            if delta:  # 如果有新内容，返回
+                                yield delta
+                        except Exception as e:
+                            print(f"Error processing chunk: {e}")
+                            continue
+
+
+                return stream_responses()
+            else:
+                # 提取非流式返回的内容
+                return res.choices[0].message.content
+        except Exception as e:
+            print(f"Error during chat: {e}")
+            return None
 # 测试代码
 async def test():
     key = "7305f8f725fd64362176a8cc68f1d909.fHTbqG2ArlpGP901"
