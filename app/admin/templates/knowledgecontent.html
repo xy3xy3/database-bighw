@@ -82,7 +82,6 @@ body_button %}
                     success: function (res) {
                       layer.msg(res.msg);
                       if (res.code === 0) {
-                        table.reload("LAY-list");
                         layer.close(index);
                       }
                     },

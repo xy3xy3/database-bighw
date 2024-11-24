@@ -1,6 +1,9 @@
+import asyncio
 from datetime import datetime
 from fastapi import APIRouter, File, Request, Form, UploadFile
 from typing import Optional
+
+from fastapi.responses import JSONResponse
 from admin.utils.commonModel import ResponseModel
 from admin.utils.decorators import login_required
 from utils import list_to_vector
@@ -44,9 +47,20 @@ async def knowledgecontent_import_post(
     min_token: int = Form(...),
     over_leap: int = Form(...),
     file_path: Optional[str] = Form(None),
-): 
-    print(f"min_token: {min_token}, over_leap: {over_leap}, file_path: {file_path}")
-    pass
+):
+    # 异步处理导入任务
+    asyncio.create_task(process_import_task(min_token, over_leap, file_path))
+    
+    return ResponseModel(code=0, msg="成功")
+
+async def process_import_task(min_token: int, over_leap: int, file_path: Optional[str]):
+    # 模拟导入任务的异步处理
+    print(f"Starting import task with min_token: {min_token}, over_leap: {over_leap}, file_path: {file_path}")
+    
+    # 这里可以放置真正的导入逻辑
+    await asyncio.sleep(10)  # 模拟长时间运行的任务
+    
+    print("Import task completed")
 
 @router.post("/knowledgecontent_upload")
 @login_required
