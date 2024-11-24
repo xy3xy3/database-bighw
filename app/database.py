@@ -122,22 +122,42 @@ def init_db():
         );
     """)
 
-    # Config设置默认admin_user,admin_pwd
-    logging.info("Inserting default admin_user into config table if it does not exist.")
+    # 插入默认数据
+    logging.info("Inserting default records.")
+
+    # 插入模型数据
     cursor.execute("""
-        INSERT INTO "config" (k, v)
-        SELECT 'admin_user', 'admin'
-        WHERE NOT EXISTS (
-            SELECT 1 FROM "config" WHERE k = 'admin_user'
-        );
+        INSERT INTO model (name, base_url, api_key, model_type)
+        VALUES
+            ('embedding-3', 'https://open.bigmodel.cn/api/paas/v4', '7305f8f725fd64362176a8cc68f1d909.fHTbqG2ArlpGP901', 0),
+            ('glm-4-flash', 'https://open.bigmodel.cn/api/paas/v4', '7305f8f725fd64362176a8cc68f1d909.fHTbqG2ArlpGP901', 1),
+            ('glm-4-long', 'https://open.bigmodel.cn/api/paas/v4', '7305f8f725fd64362176a8cc68f1d909.fHTbqG2ArlpGP901', 1)
+        ON CONFLICT DO NOTHING;
     """)
-    logging.info("Inserting default admin_pwd into config table if it does not exist.")
+
+    # 插入知识库数据
+    cursor.execute("""
+        INSERT INTO knowledgebase (name, description, model_id)
+        VALUES
+            ('中山大学知识库', '1', 1)
+        ON CONFLICT DO NOTHING;
+    """)
+
+    # 插入 Agent 数据，确保 base_ids = '1'
+    cursor.execute("""
+        INSERT INTO agent (name, base_ids, top_n, q_model_id, q_prompt, a_model_id, a_prompt)
+        VALUES
+            ('中山大学助手', '1', 100, 1, '1', 2, '1')
+        ON CONFLICT DO NOTHING;
+    """)
+
+    # Config设置默认admin_user,admin_pwd
     cursor.execute("""
         INSERT INTO "config" (k, v)
-        SELECT 'admin_pwd', 'admin'
-        WHERE NOT EXISTS (
-            SELECT 1 FROM "config" WHERE k = 'admin_pwd'
-        );
+        VALUES
+            ('admin_user', 'admin'),
+            ('admin_pwd', 'admin')
+        ON CONFLICT (k) DO NOTHING;
     """)
     conn.commit()
     cursor.close()
