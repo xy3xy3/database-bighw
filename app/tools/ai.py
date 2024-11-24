@@ -1,7 +1,7 @@
 import logging
 import re
 from openai import AsyncOpenAI
-from jsonHelper import try_parse_json_object  # 引入 try_parse_json_object
+from tools.jsonHelper import try_parse_json_object  # 引入 try_parse_json_object
 
 class ai:
     def __init__(self, api_key: str, base_url: str):
@@ -10,7 +10,7 @@ class ai:
             base_url=base_url,
         )
 
-    async def extract_json(self, model: str, system_prompt: str, user_prompt: str) -> dict:
+    async def extract_json(self, model: str, system_prompt: str, user_prompt: str,history: list = None) -> dict:
         """
         使用 AI 模型提取 JSON 对象。
 
