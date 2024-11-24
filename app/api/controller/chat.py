@@ -93,11 +93,15 @@ async def chat_endpoint(request: ChatRequest):
         questions = [item['question'] for item in questions]
     elif isinstance(questions, dict):
         print(questions)
-        extern_question = questions['question']
-        questions = [
-            extern_question,
-            origin_question
-        ]
+        if questions.get("questions") and isinstance(questions.get("questions"), list):
+            questions = [item['question'] for item in questions.get("questions")]
+        elif questions.get("question") and isinstance(questions.get("question"), str):
+            questions = [
+                questions.get("question"),
+                origin_question
+            ]
+        else:
+            questions = [origin_question]
     else:
         questions = [origin_question]
         
@@ -257,8 +261,6 @@ EXAMPLE JSON OUTPUT:
     }
 ]
 ```
-请注意输出格式必须为一个大的list，每个元素为一个字典，包含一个key为question的字符串。
-不允许在[]外面再套其他questions
 """
     user_prompt = messages[-1]['content']
     history = messages[:-1]
