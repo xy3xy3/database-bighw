@@ -15,3 +15,5 @@ pnpm-lock.yaml
 # 屏蔽 .vscode idea 文件夹
 .vscode/
 .idea/
+
+upload/
