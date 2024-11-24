@@ -92,6 +92,7 @@ async def chat_endpoint(request: ChatRequest):
     if isinstance(questions, list):
         questions = [item['question'] for item in questions]
     elif isinstance(questions, dict):
+        print(questions)
         extern_question = questions['question']
         questions = [
             extern_question,
@@ -157,50 +158,107 @@ async def questions_optimization(client:ai,model:str, messages: list,q_prompt:st
     system_prompt = f"""接下来请帮忙对问题扩展，扩展问题到1-3个，便于知识库搜索。如果用户消息带有历史记录，你需要帮忙做指代消除。
 背景知识：{q_prompt}"""+"""
 案例
-EXAMPLE INPUT: 
-中山大学在哪
+明白了，以下是按照您的要求，使用原先不完善的中文问题并生成相应的JSON输出：
+
+示例 1
+EXAMPLE INPUT: 艾菲尔铁塔在哪  
 EXAMPLE JSON OUTPUT:
-```
+```json
 [
     {
-        "question": "中山大学地理位置"
+        "question": "艾菲尔铁塔的位置"
     },
     {
-        "question": "怎么去中山大学"
-    },
-    {
-        "question": "中山大学往哪走"
+        "question": "艾菲尔铁塔的地址"
     }
 ]
 ```
-EXAMPLE INPUT: 
-history:
-中山大学校长是谁
-output:
-是高松
-current:
-他年级多大
+
+示例 2
+EXAMPLE INPUT: 怎么去机场  
 EXAMPLE JSON OUTPUT:
-```
+```json
 [
     {
-        "question": "中山大学校长年级多大"
+        "question": "去机场的路线"
     },
     {
-        "question": "高松年级多大"
+        "question": "到达机场的步骤"
     }
 ]
 ```
-EXAMPLE INPUT: 
-分数线
+
+示例 3
+EXAMPLE INPUT: 光合作用是什么  
 EXAMPLE JSON OUTPUT:
-```
+```json
 [
     {
-        "question": "分数线是多少"
+        "question": "光合作用的定义"
+    },
+    {
+        "question": "光合作用的过程解释"
     }
 ]
 ```
+
+示例 4
+EXAMPLE INPUT: 怎么烤蛋糕  
+EXAMPLE JSON OUTPUT:
+```json
+[
+    {
+        "question": "烤蛋糕的步骤"
+    },
+    {
+        "question": "烤蛋糕的食谱"
+    }
+]
+```
+
+示例 5
+EXAMPLE INPUT: iPhone什么时候发明的  
+EXAMPLE JSON OUTPUT:
+```json
+[
+    {
+        "question": "iPhone的发明日"
+    },
+    {
+        "question": "iPhone的创建年份"
+    }
+]
+```
+
+示例 6
+EXAMPLE INPUT: 为什么天空是蓝色的  
+EXAMPLE JSON OUTPUT:
+```json
+[
+    {
+        "question": "天空呈现蓝色的原因"
+    },
+    {
+        "question": "天空为什么是蓝色的解释"
+    }
+]
+```
+
+示例 7
+EXAMPLE INPUT: 谁发现了重力  
+EXAMPLE JSON OUTPUT:
+```json
+[
+    {
+        "question": "发现重力的科学家"
+    },
+    {
+        "question": "发现重力的人的名字"
+    }
+]
+```
+请注意输出格式必须为一个大的list，每个元素为一个字典，包含一个key为question的字符串。
+不允许在[]外面再套其他questions
 """
     user_prompt = messages[-1]['content']
     history = messages[:-1]
