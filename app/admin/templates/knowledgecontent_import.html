@@ -15,16 +15,16 @@
         
         {{ select_field('知识库', 'base_id', options=knowledgebases, required=True) }}
         <div class="layui-form-item">
-            <label class="layui-form-label">最小分割</label>
+            <label class="layui-form-label">最大token</label>
             <div class="layui-input-inline">
-                <input type="number" name="min_token" id="min_token" placeholder="请输入最小分割" autocomplete="off"
+                <input type="number" name="max_len" id="max_len" placeholder="请输入最大token" autocomplete="off"
                     class="layui-input" value="" required="" lay-verify="required">
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label">重复数量</label>
+            <label class="layui-form-label">每段重叠token</label>
             <div class="layui-input-inline">
-                <input type="number" name="over_leap" id="over_leap" placeholder="请输入重复数量" autocomplete="off"
+                <input type="number" name="over_leap" id="over_leap" placeholder="请输入每段重叠token" autocomplete="off"
                     class="layui-input" value="" required="" lay-verify="required">
             </div>
         </div>

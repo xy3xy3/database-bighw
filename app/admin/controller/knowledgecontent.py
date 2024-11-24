@@ -47,16 +47,16 @@ async def knowledgecontent_import(request: Request):
 async def knowledgecontent_import_post(
     request: Request,
     base_id: int = Form(...),
-    min_token: int = Form(...),
+    max_len: int = Form(...),
     over_leap: int = Form(...),
     file_path: Optional[str] = Form(None),
 ):
     # 异步处理导入任务
-    asyncio.create_task(process_import_task(base_id, min_token, over_leap, file_path))
+    asyncio.create_task(process_import_task(base_id, max_len, over_leap, file_path))
     
     return ResponseModel(code=0, msg="成功")
 
-async def process_import_task(base_id:int,min_token: int, over_leap: int, file_path: Optional[str]):
+async def process_import_task(base_id:int,max_len: int, over_leap: int, file_path: Optional[str]):
     knowledegebase_model = KnowledgeBaseModel()
     embedding_model =knowledegebase_model.get_model_details_by_base_id(base_id)
     # 假设cjf得到的结果list是res
