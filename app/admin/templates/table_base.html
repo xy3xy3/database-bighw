@@ -34,6 +34,8 @@
             <div style="padding-bottom: 10px">
               <button class="layui-btn layuiadmin-btn-list" data-type="batchdel">删除</button>
               <button class="layui-btn layuiadmin-btn-list" data-type="add">添加</button>
+              {% block body_button %}
+              {% endblock %}
             </div>
             <table id="LAY-list" lay-filter="LAY-list"></table>
             <script type="text/html" id="table-action-list">

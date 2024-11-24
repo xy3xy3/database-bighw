@@ -1,7 +1,11 @@
 {% extends 'table_base.html' %} {% block title %} 知识库内容管理 {% endblock %}
 {% block header %} {% from 'form_macros.html' import search_field %} {{
 search_field('关键词', 'keyword', '请输入内容关键词') }} {% endblock %} {% block
-extra_js %}
+body_button %}
+<button class="layui-btn layuiadmin-btn-list" data-type="import">
+  导入文件
+</button>
+{% endblock %} {% block extra_js %}
 <script>
   var config = {
     url: "knowledgecontent",
@@ -39,5 +43,62 @@ extra_js %}
       },
     },
   };
+</script>
+
+<script>
+  layui
+    .config({
+      base: "/admin/static/", // 静态资源所在路径
+    })
+    .use(["laydate", "index", "table", "laytpl", "admin"], function () {
+      var form = layui.form,
+        laytpl = layui.laytpl,
+        admin = layui.admin,
+        $ = layui.$;
+      var active = {
+        import: function () {
+          layer.open({
+            type: 2,
+            title: "导入文件",
+            content: "/admin/knowledgecontent_import",
+            area: ["550px", "550px"],
+            btn: ["确定", "取消"],
+            yes: function (index, layero) {
+              var iframeWindow = window["layui-layer-iframe" + index],
+                submitID = "LAY-user-front-submit",
+                submit = layero
+                  .find("iframe")
+                  .contents()
+                  .find("#" + submitID);
+
+              iframeWindow.layui.form.on(
+                "submit(" + submitID + ")",
+                function (data) {
+                  var field = data.field;
+                  admin.req({
+                    url: "/admin/knowledgecontent_import",
+                    method: "POST",
+                    data: field,
+                    success: function (res) {
+                      layer.msg(res.msg);
+                      if (res.code === 0) {
+                        layer.close(index);
+                      }
+                    },
+                  });
+                }
+              );
+              submit.trigger("click");
+            },
+          });
+        },
+      };
+
+      // 绑定按钮事件
+      $(".layui-btn.layuiadmin-btn-list").on("click", function () {
+        var type = $(this).data("type");
+        active[type] && active[type].call(this);
+      });
+    });
 </script>
 {% endblock %}
