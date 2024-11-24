@@ -37,7 +37,15 @@ async def knowledgecontent_form(request: Request):
 @login_required
 async def knowledgecontent_import(request: Request):
     return templates.TemplateResponse("knowledgecontent_import.html", {"request": request})
-
+@router.post("/knowledgecontent_import")
+@login_required
+async def knowledgecontent_import_post(
+    request: Request,
+    min_token: int = Form(...),
+    over_leap: int = Form(...),
+    file_path: Optional[str] = Form(None),
+): 
+    pass
 
 @router.post("/knowledgecontent_upload")
 @login_required

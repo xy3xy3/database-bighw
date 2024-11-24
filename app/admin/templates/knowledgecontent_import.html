@@ -32,11 +32,54 @@
                 <input type="hidden" name="file_path" id="file_path">
             </div>
         </div>
+        <div class="layui-form-item layui-hide">
+            <input type="button" lay-submit lay-filter="LAY-user-front-submit" id="LAY-user-front-submit" value="确认" />
+          </div>
     </div>
 
     <script src="/admin/static/layui/layui.js"></script>
     <script>
-        layui.use(function () {
+        let initData
+
+        function initForm(data) {
+          let jsonString = JSON.stringify(data)
+          initData = JSON.parse(jsonString)
+        }
+
+        function initDatePickers() {
+          layui.use('laydate', function () {
+            var laydate = layui.laydate
+
+            if (document.getElementById('start_time')) {
+              laydate.render({
+                elem: '#start_time', // 开始时间元素的 ID
+                type: 'date' // 设置日期选择器类型为日期
+              })
+            }
+
+            if (document.getElementById('end_time')) {
+              laydate.render({
+                elem: '#end_time', // 结束时间元素的 ID
+                type: 'date' // 设置日期选择器类型为日期
+              })
+            }
+          })
+        }
+        layui
+          .config({
+            base: '/admin/static/' // 静态资源所在路径
+          })
+          .use(['index', 'form', 'upload'], function () {
+            var $ = layui.$,
+              form = layui.form
+            //接收初始化数据
+            if (initData != undefined && initData != null) {
+              //额外，根据captain_id选择
+              initData.captain = initData.captain_id
+              console.log(initData)
+              form.val('layuiadmin-form', initData)
+              $('input[type="password"]').val('')
+            }
             var upload = layui.upload;
             var $ = layui.$;
             // 渲染 LayUI 上传组件
