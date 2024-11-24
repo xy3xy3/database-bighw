@@ -1,7 +1,7 @@
 import asyncio
 from datetime import datetime
 from fastapi import APIRouter, File, Request, Form, UploadFile
-from typing import Optional
+from typing import List, Optional
 
 from fastapi.responses import JSONResponse
 from admin.utils.commonModel import ResponseModel
