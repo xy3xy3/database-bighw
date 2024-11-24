@@ -11,4 +11,4 @@ json_repair
 tiktoken
 langchain
 langchain-community
-"unstructured[md]" nltk
+nltk
