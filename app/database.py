@@ -124,31 +124,29 @@ def init_db():
 
     # 插入默认数据
     logging.info("Inserting default records.")
-
+    # 禁用唯一约束检查
+    cursor.execute("SET session_replication_role = 'replica';")
     # 插入模型数据
     cursor.execute("""
         INSERT INTO model (name, base_url, api_key, model_type)
         VALUES
             ('embedding-3', 'https://open.bigmodel.cn/api/paas/v4', '7305f8f725fd64362176a8cc68f1d909.fHTbqG2ArlpGP901', 0),
             ('glm-4-flash', 'https://open.bigmodel.cn/api/paas/v4', '7305f8f725fd64362176a8cc68f1d909.fHTbqG2ArlpGP901', 1),
-            ('glm-4-long', 'https://open.bigmodel.cn/api/paas/v4', '7305f8f725fd64362176a8cc68f1d909.fHTbqG2ArlpGP901', 1)
-        ON CONFLICT DO NOTHING;
-    """)
+            ('glm-4-long', 'https://open.bigmodel.cn/api/paas/v4', '7305f8f725fd64362176a8cc68f1d909.fHTbqG2ArlpGP901', 1);
+        """)
 
     # 插入知识库数据
     cursor.execute("""
         INSERT INTO knowledgebase (name, description, model_id)
         VALUES
-            ('中山大学知识库', '1', 1)
-        ON CONFLICT DO NOTHING;
+            ('中山大学知识库', '1', 1);
     """)
 
     # 插入 Agent 数据，确保 base_ids = '1'
     cursor.execute("""
         INSERT INTO agent (name, base_ids, top_n, q_model_id, q_prompt, a_model_id, a_prompt)
         VALUES
-            ('中山大学助手', '1', 100, 1, '1', 2, '1')
-        ON CONFLICT DO NOTHING;
+            ('中山大学助手', '1', 100, 1, '1', 2, '1');
     """)
 
     # Config设置默认admin_user,admin_pwd
@@ -156,9 +154,11 @@ def init_db():
         INSERT INTO "config" (k, v)
         VALUES
             ('admin_user', 'admin'),
-            ('admin_pwd', 'admin')
-        ON CONFLICT (k) DO NOTHING;
+            ('admin_pwd', 'admin');
     """)
+    # 恢复外键约束检查
+    logging.info("Enabling foreign key checks.")
+    cursor.execute("SET session_replication_role = 'origin';")
     conn.commit()
     cursor.close()
     conn.close()
