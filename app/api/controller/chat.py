@@ -78,6 +78,7 @@ async def chat_endpoint(request: ChatRequest):
             
     # 问题优化模型
     q_model = agent['q_model']
+    print(q_model)
     if q_model['type'] != 1:
         raise HTTPException(status_code=400, detail="指定的模型不是问题优化模型")
     q_client = ai(api_key=q_model['api_key'], base_url=q_model['base_url'])

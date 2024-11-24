@@ -146,7 +146,7 @@ def init_db():
     cursor.execute("""
         INSERT INTO agent (name, base_ids, top_n, q_model_id, q_prompt, a_model_id, a_prompt)
         VALUES
-            ('中山大学助手', '1', 100, 1, '1', 2, '1');
+            ('中山大学助手', '1', 100, 2, '问题关于中山大学', 3, '回答关于中山大学问题');
     """)
 
     # Config设置默认admin_user,admin_pwd
