@@ -1,6 +1,12 @@
 {% extends 'table_base.html' %} {% block title %} 知识库内容管理 {% endblock %}
 {% block header %} {% from 'form_macros.html' import search_field %} {{
-search_field('关键词', 'keyword', '请输入内容关键词') }} {% endblock %} {% block
+search_field('关键词', 'keyword', '请输入内容关键词') }} {% endblock %} 
+
+
+{% block body_button %}
+<button class="layui-btn layuiadmin-btn-list" data-type="import">导入文件</button>
+{% endblock %}
+{% block
 extra_js %}
 <script>
   var config = {
@@ -39,5 +45,34 @@ extra_js %}
       },
     },
   };
+</script>
+
+<script>
+  layui
+    .config({
+      base: "/admin/static/", // 静态资源所在路径
+    })
+    .use([], function () {
+
+      var form = layui.form,
+        laytpl = layui.laytpl,
+        $ = layui.$;
+      var active = {
+        import: function () {
+          layer.open({
+            type: 2,
+            title: "导入文件",
+            content: "/admin/knowledgecontent_import",
+            area: ["550px", "550px"],
+          });
+        },
+      };
+
+      // 绑定按钮事件
+      $(".layui-btn.layuiadmin-btn-list").on("click", function () {
+        var type = $(this).data("type");
+        active[type] && active[type].call(this);
+      });
+    });
 </script>
 {% endblock %}

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>导入文件</title>
+    <link rel="stylesheet" href="/admin/static/layui/css/layui.css" media="all" />
+</head>
+
+<body>
+    <div class="layui-form" lay-filter="layuiadmin-form" id="layuiadmin-form" style="padding: 20px 0 0 0">
+        <div class="layui-form-item">
+            <label class="layui-form-label">最小分割</label>
+            <div class="layui-input-inline">
+                <input type="number" name="min_token" id="min_token" placeholder="请输入最小分割" autocomplete="off"
+                    class="layui-input" value="" required="" lay-verify="required">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">重复数量</label>
+            <div class="layui-input-inline">
+                <input type="number" name="over_leap" id="over_leap" placeholder="请输入重复数量" autocomplete="off"
+                    class="layui-input" value="" required="" lay-verify="required">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">上传文件</label>
+            <div class="layui-input-inline layui-upload-drag" id="ID-upload-demo-drag">
+                <i class="layui-icon layui-icon-upload"></i>
+                <div>点击上传，或将文件拖拽到此处</div>
+                <input type="hidden" name="file_path" id="file_path">
+            </div>
+        </div>
+    </div>
+
+    <script src="/admin/static/layui/layui.js"></script>
+    <script>
+        layui.use(function () {
+            var upload = layui.upload;
+            var $ = layui.$;
+            // 渲染 LayUI 上传组件
+            upload.render({
+                elem: '#ID-upload-demo-drag', // 绑定上传按钮
+                url: '/admin/knowledgecontent_upload',         // 后端文件上传接口
+                accept: 'file',              // 支持所有文件类型
+                done: function (res) {
+                    // 上传完成后的回调
+                    if (res.code == 0) {
+                        layer.msg('上传成功');
+                        $("#file_path").val(res.msg)
+                        console.log($("#file_path").val())
+                    } else {
+                        layer.msg('上传失败：' + (res.msg || '未知错误'));
+                    }
+                },
+                error: function () {
+                    // 上传失败的回调
+                    layer.msg('上传失败，请重试');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

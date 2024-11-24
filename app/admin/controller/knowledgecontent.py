@@ -1,5 +1,5 @@
 from datetime import datetime
-from fastapi import APIRouter, Request, Form
+from fastapi import APIRouter, File, Request, Form, UploadFile
 from typing import Optional
 from admin.utils.commonModel import ResponseModel
 from admin.utils.decorators import login_required
@@ -9,6 +9,7 @@ from models.KnowledgeContentModel import KnowledgeContentModel
 from models.KnowledgeBaseModel import KnowledgeBaseModel
 from fastapi.templating import Jinja2Templates
 import os
+import shutil
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
@@ -30,6 +31,32 @@ async def knowledgecontent_form(request: Request):
     knowledgebase_model = KnowledgeBaseModel()  # 实例化知识库数据访问对象
     knowledgebases = knowledgebase_model.get_options_list("id", "name")  # 获取知识库列表
     return templates.TemplateResponse("knowledgecontent_form.html", {"request": request, "knowledgebases": knowledgebases})
+
+# 知识库导入文件
+@router.get("/knowledgecontent_import")
+@login_required
+async def knowledgecontent_import(request: Request):
+    return templates.TemplateResponse("knowledgecontent_import.html", {"request": request})
+
+
+@router.post("/knowledgecontent_upload")
+@login_required
+async def knowledgecontent_upload(request: Request,file: UploadFile = File(...)):
+    try:
+        # 使用相对路径指定上传文件夹
+        upload_folder = os.path.join("app", "upload")
+        os.makedirs(upload_folder, exist_ok=True)  # 确保目标文件夹存在
+        file_path = os.path.join(upload_folder, file.filename)
+
+        # 保存文件到相对路径
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+
+
+        return ResponseModel(code=0, msg=file_path)
+    except Exception as e:
+        return ResponseModel(code=1, msg=f"文件处理失败：{str(e)}")
+    
 
 # 知识库内容 - 搜索
 @router.post("/knowledgecontent/search")
