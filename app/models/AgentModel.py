@@ -34,8 +34,7 @@ class AgentModel(BaseModel):
             "id": agent['id'],
             "name": agent['name'],
             "base_ids": agent['base_ids'],
-            "max_ref": agent['max_ref'],
-            "min_cor": agent['min_cor'],
+            "top_n": agent['top_n'],
             "q_model": {
                 "id": q_model['id'],
                 "name": q_model['name'],
