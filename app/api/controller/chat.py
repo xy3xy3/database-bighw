@@ -82,7 +82,7 @@ async def chat_endpoint(request: ChatRequest):
         # 暂时只实现单一知识库关联
         question = messages[-1]['content']
         questions = [question]
-        knowledges = await get_knowledges(base_ids,top_n,questions)
+        knowledges = await get_knowledges(base_ids,questions,top_n)
         knowledges_text = "\n\n".join(knowledges)
         messages[-1]['content'] = f"使用下面<data></data>的知识辅助回答问题" \
         f"<data>{knowledges_text}</data>\n用户问题:\n'''{question}'''"
@@ -132,7 +132,7 @@ async def chat_endpoint(request: ChatRequest):
             raise HTTPException(status_code=500, detail=str(e))
 
 
-async def get_knowledges(base_ids:list, questions:str,top_n:int)->list:
+async def get_knowledges(base_ids:list, questions:list,top_n:int)->list:
     # TODO:进一步并行 优化查询速度
     base_model = KnowledgeBaseModel()
     content_model = KnowledgeContentModel()
@@ -146,6 +146,6 @@ async def get_knowledges(base_ids:list, questions:str,top_n:int)->list:
     # 对每个base_id，用每个embedding去搜索
     res = []
     for embedding in embedding_list:
-        contents = await content_model.get_nearest_neighbors(embedding,top_n=top_n,base_ids=base_ids)
+        contents = content_model.get_nearest_neighbors(embedding,top_n=top_n,base_ids=base_ids)
         res.extend(contents)
     return res
