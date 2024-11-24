@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from admin.router import admin_router
 from test.router import test_router
-# from home.router import home_router
+from api.router import api_router
 from middleware.auth import AdminAuthMiddleware
 from utils import *  # 用于密码哈希等
 from database import init_db, reset_db  # 导入数据库初始化函数
@@ -39,6 +39,11 @@ app.mount("/admin", admin_app)
 test_app = FastAPI()
 test_app.include_router(test_router)
 app.mount("/test", test_app)
+
+
+api_app = FastAPI()
+api_app.include_router(api_router)
+app.mount("/api", api_app)
 
 # home_app = FastAPI()
 # home_app.include_router(home_router)
