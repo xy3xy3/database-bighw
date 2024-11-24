@@ -1,7 +1,7 @@
 import logging
 import re
 from openai import AsyncOpenAI
-from jsonHelper import try_parse_json_object  # 引入 try_parse_json_object
+from .jsonHelper import try_parse_json_object  # 引入 try_parse_json_object
 
 class ai:
     def __init__(self, api_key: str, base_url: str):

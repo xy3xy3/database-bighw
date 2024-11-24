@@ -13,6 +13,8 @@ from models.KnowledgeBaseModel import KnowledgeBaseModel
 from fastapi.templating import Jinja2Templates
 import os
 import shutil
+from tools.LoadMd import load_markdown_to_documents, split_documents_by_token
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
@@ -56,11 +58,35 @@ async def knowledgecontent_import_post(
     
     return ResponseModel(code=0, msg="成功")
 
+async def split_markdown_file(file_path: str, max_len: int, over_leap: int) -> List[str]:
+    """
+    根据给定的文件路径、最大长度和重叠量，拆分 Markdown 文件内容。
+
+    参数:
+    file_path (str): Markdown 文件的路径。
+    max_len (int): 每个块的最大长度（以 token 为单位）。
+    over_leap (int): 块之间的重叠长度（以 token 为单位）。
+
+    返回:
+    List[str]: 拆分后的文本块列表。
+    """
+    # 加载 Markdown 文件并转换为 Document 对象
+    documents = load_markdown_to_documents(file_path)
+    
+    # 基于 token 进行拆分
+    split_texts = split_documents_by_token(documents, chunk_size=max_len, chunk_overlap=over_leap)
+    
+    return split_texts
+
 async def process_import_task(base_id:int,max_len: int, over_leap: int, file_path: Optional[str]):
     knowledegebase_model = KnowledgeBaseModel()
     embedding_model =knowledegebase_model.get_model_details_by_base_id(base_id)
-    # 假设cjf得到的结果list是res
-    res = []
+    # 调用切割函数获取拆分后的文本列表
+    if file_path:
+        res = split_markdown_file(file_path, max_len, over_leap)
+    else:
+        res = []
+        
     aiApi = ai(embedding_model['api_key'],embedding_model['base_url'])
     model_name = embedding_model['model_name']
     for context in res:
