@@ -43,7 +43,7 @@ app.mount("/test", test_app)
 
 api_app = FastAPI()
 api_app.include_router(api_router)
-app.mount("/api", api_app)
+app.mount("/v1", api_app)
 
 # home_app = FastAPI()
 # home_app.include_router(home_router)

@@ -1,5 +1,6 @@
 from openai import AsyncOpenAI
 
+from openai import AsyncOpenAI
 
 class ai:
     def __init__(self, api_key: str, base_url: str):
@@ -20,7 +21,7 @@ class ai:
             print(e)
             return None
 
-    async def chat(self, model: str, messages: list, stream: bool = False) -> list:
+    async def chat(self, model: str, messages: list, stream: bool = False):
         """聊天方法，兼容 OpenAI 风格的 API"""
         try:
             res = await self.client.chat.completions.create(
@@ -30,12 +31,18 @@ class ai:
             )
 
             if stream:
+                # 返回一个异步生成器
                 async def stream_responses():
                     async for chunk in res:
-                        # 提取流式返回的内容
-                        delta = chunk.choices[0].delta.get('content', '')
-                        if delta:  # 如果有新内容，返回
-                            yield delta
+                        try:
+                            # 检查 delta 是否为对象或者字典
+                            delta = getattr(chunk.choices[0].delta, 'content', '') if hasattr(chunk.choices[0].delta, 'content') else ''
+                            if delta:  # 如果有新内容，返回
+                                yield delta
+                        except Exception as e:
+                            print(f"Error processing chunk: {e}")
+                            continue
+
 
                 return stream_responses()
             else:
@@ -44,6 +51,7 @@ class ai:
         except Exception as e:
             print(f"Error during chat: {e}")
             return None
+
 
 # 测试代码，确保兼容性
 async def test():

@@ -2,7 +2,7 @@
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse, JSONResponse
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Union
 import asyncio
 from models.AgentModel import AgentModel
 from tools.ai import ai
@@ -10,14 +10,21 @@ import time
 
 router = APIRouter()
 
+class ContentItem(BaseModel):
+    type: str  # 内容类型，例如 "text"
+    text: str  # 实际的内容
+
 class Message(BaseModel):
     role: str
-    content: str
+    content: Union[str, List[ContentItem]]  # 支持字符串或复杂的内容结构
 
 class ChatRequest(BaseModel):
     model: str
     messages: List[Message]
     stream: Optional[bool] = False
+    temperature: Optional[float] = 1.0  # 新增支持的字段
+    max_tokens: Optional[int] = None  # 新增支持的字段
+
 
 class Usage(BaseModel):
     prompt_tokens: int = 0
@@ -40,7 +47,8 @@ class ChatCompletionResponse(BaseModel):
     choices: List[Choice]
     usage: Usage
 
-@router.post("/chat")
+@router.post("/chat/completions")
+@router.post("/chat/completions")
 async def chat_endpoint(request: ChatRequest):
     agent_model = AgentModel()
     agent = agent_model.get_agent_by_id(int(request.model))
@@ -56,29 +64,32 @@ async def chat_endpoint(request: ChatRequest):
     ai_client = ai(api_key=a_model['api_key'], base_url=a_model['base_url'])
 
     # 准备消息
-    messages = [{"role": msg.role, "content": msg.content} for msg in request.messages]
+    messages = []
+    for msg in request.messages:
+        if isinstance(msg.content, list):  # 如果 content 是复杂对象列表
+            combined_text = " ".join(item.text for item in msg.content)  # 拼接为字符串
+            messages.append({"role": msg.role, "content": combined_text})
+        else:
+            messages.append({"role": msg.role, "content": msg.content})
 
     if request.stream:
         try:
             async def event_generator():
-                async for chunk in ai_client.chat(model=a_model['name'], messages=messages, stream=True):
-                    # 根据参考格式解析和返回数据
-                    if isinstance(chunk, dict):  # 假设返回的是已解析的 JSON
-                        yield f"data: {chunk}\n\n"
-                    else:
-                        # 如果返回的不是 JSON，需要手动组装
-                        delta_content = {"content": chunk}
-                        response = {
-                            "id": f"chatcmpl-{int(time.time())}",
-                            "object": "chat.completion.chunk",
-                            "created": int(time.time()),
-                            "model": a_model['name'],
-                            "choices": [{"index": 0, "delta": delta_content}],
-                        }
-                        yield f"data: {response}\n\n"
+                async for chunk in (await ai_client.chat(model=a_model['name'], messages=messages, stream=True)):
+                    delta_content = {"content": chunk}  # 修复解析逻辑
+                    response = {
+                        "id": f"chatcmpl-{int(time.time())}",
+                        "object": "chat.completion.chunk",
+                        "created": int(time.time()),
+                        "model": a_model['name'],
+                        "choices": [{"index": 0, "delta": delta_content}],
+                    }
+                    yield f"data: {response}\n\n"
 
                 # 结束标记
                 yield f"data: [DONE]\n\n"
+
+
             return StreamingResponse(event_generator(), media_type="text/event-stream")
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
