@@ -22,7 +22,7 @@ async def lifespan(app: FastAPI):
     # 应用关闭时执行的操作（如果有）
 
 # 使用 lifespan 管理生命周期
-app = FastAPI(title="在线购物系统", lifespan=lifespan)
+app = FastAPI(title="AI AGENT", lifespan=lifespan)
 
 # 获取项目的根目录
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
