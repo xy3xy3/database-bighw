@@ -36,6 +36,13 @@ class BaseModel:
         sql = f'DELETE FROM "{self.db_schema}"."{self.table_name}" WHERE id = %s'
         self.cursor.execute(sql, (id,))
         self.conn.commit()
+    def batch_delete(self, ids: list):
+        """批量删除表中的数据"""
+        placeholders = ', '.join(['%s' for _ in ids])
+        sql = f'DELETE FROM "{self.db_schema}"."{self.table_name}" WHERE id IN ({placeholders})'
+        self.cursor.execute(sql, ids)
+        self.conn.commit()
+        return True
 
     def get_by_id(self, id: int):
         """根据ID获取单条记录"""

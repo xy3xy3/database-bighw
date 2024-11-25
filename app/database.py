@@ -51,6 +51,10 @@ def init_db():
             content TEXT
         );
     """)
+    cursor.execute("""
+        CREATE INDEX IF NOT EXISTS idx_session_id ON message (session_id);
+    """)
+
 
     # 创建 model 表
     logging.info("Creating model table if it does not exist.")

@@ -1,8 +1,8 @@
 {% extends 'table_base.html' %}
 {% block title %} 消息管理 {% endblock %}
 {% block header %}
-  <!-- {% from 'form_macros.html' import search_field %}
-  {{ search_field('历史记录ID', 'history_id', '请输入历史记录ID') }} -->
+  {% from 'form_macros.html' import search_field %}
+  {{ search_field('会话ID', 'session_id', '请输入会话ID') }}
 {% endblock %}
 {% block extra_js %}
 <script>
@@ -16,7 +16,8 @@
         [
           { type: "checkbox", fixed: "left" },
           { field: "id", width: 80, title: "ID", sort: true },
-          { field: "history_id", title: "历史记录ID", width: 150 },
+          { field: "session_id", title: "会话ID", width: 150 },
+          { field: "created_at", title: "创建时间", width: 150 },
           { field: "role", title: "角色", width: 100 },
           { field: "content", title: "内容", width: 200 },
           {

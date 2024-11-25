@@ -1,5 +1,7 @@
 # File: app/api/controller/chat.py
 import json
+import random
+import string
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse, JSONResponse
 from pydantic import BaseModel
@@ -8,6 +10,8 @@ import asyncio
 from models.KnowledgeContentModel import KnowledgeContentModel
 from models.KnowledgeBaseModel import KnowledgeBaseModel
 from models.AgentModel import AgentModel
+from models.MessageModel import MessageModel
+
 from tools.ai import ai
 import time
 
@@ -28,8 +32,9 @@ class ChatRequest(BaseModel):
     model: str
     messages: List[Message]
     stream: Optional[bool] = False
-    temperature: Optional[float] = 1.0  # 新增支持的字段
-    max_tokens: Optional[int] = None  # 新增支持的字段
+    temperature: Optional[float] = 1.0
+    max_tokens: Optional[int] = None
+    session_id: Optional[str] = None
 
 
 class Usage(BaseModel):
@@ -59,6 +64,9 @@ class ChatCompletionResponse(BaseModel):
 
 @router.post("/chat/completions")
 async def chat_endpoint(request: ChatRequest):
+    session_id = request.session_id if request.session_id else ''.join(random.choices(string.ascii_letters + string.digits, k=64))
+    message_model = MessageModel()
+
     agent_model = AgentModel()
     if request.model.startswith("gpt-"):
         id = 1
@@ -116,7 +124,12 @@ async def chat_endpoint(request: ChatRequest):
             questions = [origin_question]
     else:
         questions = [origin_question]
-
+    user_message = {
+        "session_id": session_id,
+        "role": "user",
+        "content": messages[-1]['content']
+    }
+    message_model.save(user_message)
     base_ids = agent['base_ids'].split(",")
     a_prompt = agent['a_prompt']
     if len(base_ids) > 0:
@@ -128,11 +141,10 @@ async def chat_endpoint(request: ChatRequest):
         try:
 
             async def event_generator():
-                async for chunk in (await
-                                    chat_client.chat(model=a_model['name'],
-                                                     messages=messages,
-                                                     stream=True)):
-                    delta_content = {"content": chunk.strip()}  # 确保内容清洁且正确
+                collected_response = ""
+                async for chunk in (await chat_client.chat(model=a_model['name'], messages=messages, stream=True)):
+                    delta_content = chunk.strip()
+                    collected_response += delta_content
                     response = {
                         "id": f"chatcmpl-{int(time.time())}",
                         "object": "chat.completion.chunk",
@@ -140,11 +152,17 @@ async def chat_endpoint(request: ChatRequest):
                         "model": a_model['name'],
                         "choices": [{
                             "index": 0,
-                            "delta": delta_content
+                            "delta": {"content": delta_content}
                         }],
                     }
                     yield f"data: {json.dumps(response)}\n\n"
-
+                # 记录AI消息
+                ai_message = {
+                    "session_id": session_id,
+                    "role": "assistant",
+                    "content": collected_response
+                }
+                message_model.save(ai_message)
                 # 结束标记
                 response = {
                     "id":
@@ -170,23 +188,22 @@ async def chat_endpoint(request: ChatRequest):
             raise HTTPException(status_code=500, detail=str(e))
     else:
         try:
-            response = await chat_client.chat(model=a_model['name'],
-                                              messages=messages,
-                                              stream=False)
-            # 构造 OpenAI 格式的响应
+            response_text = await chat_client.chat(model=a_model['name'], messages=messages, stream=False)
             openai_response = ChatCompletionResponse(
                 id=f"chatcmpl-{int(time.time())}",
                 created=int(time.time()),
-                choices=[
-                    Choice(index=0,
-                           message=ChoiceMessage(role="assistant",
-                                                 content=response),
-                           finish_reason="stop")
-                ],
-                usage=Usage(
-                    prompt_tokens=0,  # 这里需要根据实际情况填充
-                    completion_tokens=len(response.split()),
-                    total_tokens=len(response.split())))
+                choices=[Choice(index=0, message=ChoiceMessage(role="assistant", content=response_text), finish_reason="stop")],
+                usage=Usage(prompt_tokens=0, completion_tokens=len(response_text.split()), total_tokens=len(response_text.split()))
+            )
+
+            # 记录AI消息
+            ai_message = {
+                "session_id": session_id,
+                "role": "assistant",
+                "content": response_text
+            }
+            message_model.save(ai_message)
+
             return JSONResponse(content=openai_response.dict())
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
