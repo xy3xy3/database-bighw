@@ -4,5 +4,5 @@
 {% endblock %}
 {% block content %}
   {% from 'form_macros.html' import input_field, select_field, textarea_field %}
-  {{ input_field('SMTP服务器', 'smtp_server', '请输入SMTP服务器地址', value=smtp_config.smtp_server, required=True) }}
+    {{ input_field('API Key', 'api_key', '请输入API Key', value=config.api_key, required=True) }}
 {% endblock %}

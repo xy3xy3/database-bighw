@@ -49,7 +49,7 @@
           form.on('submit(set)', function (obj) {
             var load = layer.load()
             $.ajax({
-              url: '/api/admin/{{ url }}',
+              url: '/admin/{{ url }}',
               data: obj.field,
               method: 'POST',
               dataType: 'json',

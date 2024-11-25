@@ -127,7 +127,7 @@
                 function (index) {
                   var ids = checkData.map((item) => item.id);
                   admin.req({
-                    url: "/api/admin/" + window.config.url,
+                    url: "/admin/" + window.config.url,
                     method: "DELETE",
                     contentType: "application/json;charset=UTF-8",
                     data: JSON.stringify({ ids: ids }),
@@ -153,7 +153,7 @@
                 "确定删除" + window.config.name + "吗？",
                 function (index) {
                   admin.req({
-                    url: "/api/admin/" + window.config.url + '/' + data.id,
+                    url: "/admin/" + window.config.url + '/' + data.id,
                     method: "DELETE",
                     success: function (res) {
                       layer.msg(res.msg);
