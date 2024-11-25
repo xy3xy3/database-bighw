@@ -40,24 +40,13 @@ def init_db():
     conn = db.get_connection()
     cursor = conn.cursor()
 
-    # 创建 history 表
-    logging.info("Creating history table if it does not exist.")
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS history (
-            id SERIAL PRIMARY KEY,
-            flag VARCHAR(255),
-            created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-            agent_id INTEGER
-        );
-    """)
-
-    # 创建 message 表，添加外键依赖 history 表
+    # 创建 message 表
     logging.info("Creating message table if it does not exist.")
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS message (
             id SERIAL PRIMARY KEY,
             created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-            history_id INTEGER REFERENCES history(id) ON DELETE CASCADE,
+            session_id VARCHAR(64),
             role VARCHAR(50),
             content TEXT
         );
@@ -184,8 +173,6 @@ def reset_db():
         cursor.execute("DROP TABLE IF EXISTS knowledge_content CASCADE;")
         logging.info("Dropping knowledgebase table if it exists.")
         cursor.execute("DROP TABLE IF EXISTS knowledgebase CASCADE;")
-        logging.info("Dropping history table if it exists.")
-        cursor.execute("DROP TABLE IF EXISTS history CASCADE;")
         logging.info("Dropping model table if it exists.")
         cursor.execute("DROP TABLE IF EXISTS model CASCADE;")
         logging.info("Dropping config table if it exists.")
