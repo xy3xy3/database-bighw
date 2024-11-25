@@ -70,23 +70,6 @@
               form.val('layuiadmin-form', initData)
               $('input[type="password"]').val('')
             }
-            // 渲染上传组件
-            upload.render({
-              elem: '[target-id]', // 匹配所有带有 target-id 属性的按钮
-              url: '/admin/api/upload', // 替换为你的上传接口
-              done: function (res, index, upload) {
-                var targetId = this.item.getAttribute('target-id')
-                var input = document.getElementById(targetId)
-                if (input) {
-                  input.value = res.url // 假设上传成功后返回的 URL 在 res.url 中
-                }
-                layer.msg('上传成功')
-                console.log(res)
-              },
-              error: function () {
-                layer.msg('上传失败')
-              }
-            })
             initDatePickers() // 初始化日期选择器
           })
       </script>

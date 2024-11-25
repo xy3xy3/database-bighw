@@ -194,10 +194,10 @@ async def knowledgecontent_del(request: Request):
 @login_required
 async def batch_del(request: Request):
     form_data = await request.form()
-    ids = form_data.get("ids[]")
+    ids = form_data.getlist("ids[]")
     model = KnowledgeContentModel()
     if ids:
-        ids = [int(id) for id in ids.split(",")]
+        ids = [int(id) for id in ids]
         model.batch_delete(ids)
         return ResponseModel(
             code=0,
