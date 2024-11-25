@@ -19,12 +19,12 @@ class AgentModel(BaseModel):
         agent = self.get_by_id(id)
         if not agent:
             return None
-            
+
         # 获取问题优化模型信息
         q_model = self.model_model.get_model_by_id(agent['q_model_id'])
         if not q_model:
             raise ValueError("问题优化模型未找到")
-        
+
         # 获取对话模型信息
         a_model = self.model_model.get_model_by_id(agent['a_model_id'])
         if not a_model:
@@ -54,6 +54,13 @@ class AgentModel(BaseModel):
         }
 
         return agent_details
+
+    def get_all(self):
+        """获取所有Agent的id,name"""
+        sql = f'SELECT id, name FROM "{self.db_schema}"."{self.table_name}"'
+        self.cursor.execute(sql)
+        results = self.cursor.fetchall()
+        return [{'id': row['id'], 'name': row['name']} for row in results]
 
     def search_agents(self, name: str = None, limit: int = 10, offset: int = 0):
         """搜索Agent"""

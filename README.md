@@ -67,3 +67,9 @@ conda activate dbhw
 cd app
 python main.py
 ```
+
+# 技术路径
+- fastgpt
+- openGauss 提供数据库
+- https://github.com/xqdoo00o/chatgpt-web 提供对话前端
+- langchain

@@ -1,4 +1,5 @@
 # File: app/api/controller/chat.py
+import json
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse, JSONResponse
 from pydantic import BaseModel
@@ -142,7 +143,7 @@ async def chat_endpoint(request: ChatRequest):
                             "delta": delta_content
                         }],
                     }
-                    yield f"data: {response}\n\n"
+                    yield f"data: {json.dumps(response)}\n\n"
 
                 # 结束标记
                 response = {
@@ -160,7 +161,7 @@ async def chat_endpoint(request: ChatRequest):
                         "finish_reason": "stop"
                     }],
                 }
-                yield f"data: {response}\n\n"
+                yield f"data: {json.dumps(response)}\n\n"
                 yield f"data: [DONE]\n\n"
 
             return StreamingResponse(event_generator(),
@@ -202,101 +203,115 @@ async def questions_optimization(client: ai,
 明白了，以下是按照您的要求，使用原先不完善的中文问题并生成相应的JSON输出：
 
 示例 1
-EXAMPLE INPUT: 艾菲尔铁塔在哪  
+EXAMPLE INPUT: 艾菲尔铁塔在哪
 EXAMPLE JSON OUTPUT:
 ```json
-[
-    {
-        "question": "艾菲尔铁塔的位置"
-    },
-    {
-        "question": "艾菲尔铁塔的地址"
-    }
-]
+{
+    "questions": [
+        {
+            "question": "艾菲尔铁塔的位置"
+        },
+        {
+            "question": "艾菲尔铁塔的地址"
+        }
+    ]
+}
 ```
 
 示例 2
-EXAMPLE INPUT: 怎么去机场  
+EXAMPLE INPUT: 怎么去机场
 EXAMPLE JSON OUTPUT:
 ```json
-[
-    {
-        "question": "去机场的路线"
-    },
-    {
-        "question": "到达机场的步骤"
-    }
-]
+{
+    "questions": [
+        {
+            "question": "去机场的路线"
+        },
+        {
+            "question": "到达机场的步骤"
+        }
+    ]
+}
 ```
 
 示例 3
-EXAMPLE INPUT: 光合作用是什么  
+EXAMPLE INPUT: 光合作用是什么
 EXAMPLE JSON OUTPUT:
 ```json
-[
-    {
-        "question": "光合作用的定义"
-    },
-    {
-        "question": "光合作用的过程解释"
-    }
-]
+{
+    "questions": [
+        {
+            "question": "光合作用的定义"
+        },
+        {
+            "question": "光合作用的过程解释"
+        }
+    ]
+}
 ```
 
 示例 4
-EXAMPLE INPUT: 怎么烤蛋糕  
+EXAMPLE INPUT: 怎么烤蛋糕
 EXAMPLE JSON OUTPUT:
 ```json
-[
-    {
-        "question": "烤蛋糕的步骤"
-    },
-    {
-        "question": "烤蛋糕的食谱"
-    }
-]
+{
+    "questions": [
+        {
+            "question": "烤蛋糕的步骤"
+        },
+        {
+            "question": "烤蛋糕的食谱"
+        }
+    ]
+}
 ```
 
 示例 5
-EXAMPLE INPUT: iPhone什么时候发明的  
+EXAMPLE INPUT: iPhone什么时候发明的
 EXAMPLE JSON OUTPUT:
 ```json
-[
-    {
-        "question": "iPhone的发明日"
-    },
-    {
-        "question": "iPhone的创建年份"
-    }
-]
+{
+    "questions": [
+        {
+            "question": "iPhone的发明日"
+        },
+        {
+            "question": "iPhone的创建年份"
+        }
+    ]
+}
 ```
 
 示例 6
-EXAMPLE INPUT: 为什么天空是蓝色的  
+EXAMPLE INPUT: 为什么天空是蓝色的
 EXAMPLE JSON OUTPUT:
 ```json
-[
-    {
-        "question": "天空呈现蓝色的原因"
-    },
-    {
-        "question": "天空为什么是蓝色的解释"
-    }
-]
+{
+    "questions": [
+        {
+            "question": "天空呈现蓝色的原因"
+        },
+        {
+            "question": "天空为什么是蓝色的解释"
+        }
+    ]
+}
 ```
 
 示例 7
-EXAMPLE INPUT: 谁发现了重力  
+EXAMPLE INPUT: 谁发现了重力
 EXAMPLE JSON OUTPUT:
 ```json
-[
-    {
-        "question": "发现重力的科学家"
-    },
-    {
-        "question": "发现重力的人的名字"
-    }
-]
+{
+    "questions": [
+        {
+            "question": "发现重力的科学家"
+        },
+        {
+            "question": "发现重力的人的名字"
+        }
+    ]
+}
 ```
 """
     user_prompt = messages[-1]['content']
