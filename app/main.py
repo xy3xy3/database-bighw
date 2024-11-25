@@ -5,7 +5,10 @@ from fastapi.staticfiles import StaticFiles
 from admin.router import admin_router
 from test.router import test_router
 from api.router import api_router
+from home.router import home_router
 from middleware.auth import AdminAuthMiddleware
+from fastapi.middleware.cors import CORSMiddleware
+
 from utils import *  # 用于密码哈希等
 from database import init_db, reset_db  # 导入数据库初始化函数
 from contextlib import asynccontextmanager
@@ -23,6 +26,14 @@ async def lifespan(app: FastAPI):
 
 # 使用 lifespan 管理生命周期
 app = FastAPI(title="AI AGENT", lifespan=lifespan)
+# 添加CORS中间件
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 允许所有来源，你可以根据需要限制特定的域名
+    allow_credentials=True,
+    allow_methods=["*"],  # 允许所有HTTP方法
+    allow_headers=["*"],  # 允许所有头部
+)
 
 # 获取项目的根目录
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -45,14 +56,14 @@ api_app = FastAPI()
 api_app.include_router(api_router)
 app.mount("/v1", api_app)
 
-# home_app = FastAPI()
-# home_app.include_router(home_router)
+home_app = FastAPI()
+home_app.include_router(home_router)
 
-# # 挂载首页静态资源
-# HOME_STATIC_DIR = os.path.join(BASE_DIR, "app", "home", "static")
-# app.mount("/static", StaticFiles(directory=HOME_STATIC_DIR), name="home_static")
+# 挂载首页静态资源
+HOME_STATIC_DIR = os.path.join(BASE_DIR, "app", "home", "static")
+app.mount("/static", StaticFiles(directory=HOME_STATIC_DIR), name="home_static")
 
-# app.mount("/", home_app)
+app.mount("/", home_app)
 
 if __name__ == "__main__":
     import uvicorn

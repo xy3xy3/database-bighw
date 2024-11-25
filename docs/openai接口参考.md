@@ -770,3 +770,89 @@ curl https://api.openai.com/v1/chat/completions
   }
 }
 ```
+
+官方stream参考
+```
+data: {"id":"chatcmpl-4FQkUfPFAE7QTJu5t7SrodriLn93W","object":"chat.completion.chunk","created":1732498066,"model":"gpt-4o-mini","choices":[{"index":0,"delta":{"role":"assistant","content":""}}]}
+
+data: {"id":"chatcmpl-4FQkUfPFAE7QTJu5t7SrodriLn93W","object":"chat.completion.chunk","created":1732498066,"model":"gpt-4o-mini","choices":[{"index":0,"delta":{"content":"你好"}}]}
+
+data: {"id":"chatcmpl-4FQkUfPFAE7QTJu5t7SrodriLn93W","object":"chat.completion.chunk","created":1732498066,"model":"gpt-4o-mini","choices":[{"index":0,"delta":{"content":"！"}}]}
+
+data: {"id":"chatcmpl-4FQkUfPFAE7QTJu5t7SrodriLn93W","object":"chat.completion.chunk","created":1732498066,"model":"gpt-4o-mini","choices":[{"index":0,"delta":{"content":"有什么"}}]}
+
+data: {"id":"chatcmpl-4FQkUfPFAE7QTJu5t7SrodriLn93W","object":"chat.completion.chunk","created":1732498066,"model":"gpt-4o-mini","choices":[{"index":0,"delta":{"content":"我"}}]}
+
+data: {"id":"chatcmpl-4FQkUfPFAE7QTJu5t7SrodriLn93W","object":"chat.completion.chunk","created":1732498066,"model":"gpt-4o-mini","choices":[{"index":0,"delta":{"content":"可以"}}]}
+
+data: {"id":"chatcmpl-4FQkUfPFAE7QTJu5t7SrodriLn93W","object":"chat.completion.chunk","created":1732498066,"model":"gpt-4o-mini","choices":[{"index":0,"delta":{"content":"帮助"}}]}
+
+data: {"id":"chatcmpl-4FQkUfPFAE7QTJu5t7SrodriLn93W","object":"chat.completion.chunk","created":1732498066,"model":"gpt-4o-mini","choices":[{"index":0,"delta":{"content":"你"}}]}
+
+data: {"id":"chatcmpl-4FQkUfPFAE7QTJu5t7SrodriLn93W","object":"chat.completion.chunk","created":1732498066,"model":"gpt-4o-mini","choices":[{"index":0,"delta":{"content":"的吗"}}]}
+
+data: {"id":"chatcmpl-4FQkUfPFAE7QTJu5t7SrodriLn93W","object":"chat.completion.chunk","created":1732498066,"model":"gpt-4o-mini","choices":[{"index":0,"delta":{"content":"？"}}]}
+
+data: {"id":"chatcmpl-4FQkUfPFAE7QTJu5t7SrodriLn93W","object":"chat.completion.chunk","created":1732498066,"model":"gpt-4o-mini","choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
+
+data: [DONE]
+
+
+```
+
+我的接口
+```
+data: {'id': 'chatcmpl-1732497986', 'object': 'chat.completion.chunk', 'created': 1732497986, 'model': 'glm-4-long', 'choices': [{'index': 0, 'delta': {'content': '您好'}}]}
+
+data: {'id': 'chatcmpl-1732497986', 'object': 'chat.completion.chunk', 'created': 1732497986, 'model': 'glm-4-long', 'choices': [{'index': 0, 'delta': {'content': '！'}}]}
+
+data: {'id': 'chatcmpl-1732497986', 'object': 'chat.completion.chunk', 'created': 1732497986, 'model': 'glm-4-long', 'choices': [{'index': 0, 'delta': {'content': '请问'}}]}
+
+data: {'id': 'chatcmpl-1732497986', 'object': 'chat.completion.chunk', 'created': 1732497986, 'model': 'glm-4-long', 'choices': [{'index': 0, 'delta': {'content': '您'}}]}
+
+data: {'id': 'chatcmpl-1732497986', 'object': 'chat.completion.chunk', 'created': 1732497986, 'model': 'glm-4-long', 'choices': [{'index': 0, 'delta': {'content': '想'}}]}
+
+data: {'id': 'chatcmpl-1732497986', 'object': 'chat.completion.chunk', 'created': 1732497986, 'model': 'glm-4-long', 'choices': [{'index': 0, 'delta': {'content': '了解'}}]}
+
+data: {'id': 'chatcmpl-1732497986', 'object': 'chat.completion.chunk', 'created': 1732497986, 'model': 'glm-4-long', 'choices': [{'index': 0, 'delta': {'content': '中山大学'}}]}
+
+data: {'id': 'chatcmpl-1732497986', 'object': 'chat.completion.chunk', 'created': 1732497986, 'model': 'glm-4-long', 'choices': [{'index': 0, 'delta': {'content': '哪些'}}]}
+
+data: {'id': 'chatcmpl-1732497986', 'object': 'chat.completion.chunk', 'created': 1732497986, 'model': 'glm-4-long', 'choices': [{'index': 0, 'delta': {'content': '方面的'}}]}
+
+data: {'id': 'chatcmpl-1732497986', 'object': 'chat.completion.chunk', 'created': 1732497986, 'model': 'glm-4-long', 'choices': [{'index': 0, 'delta': {'content': '信息'}}]}
+
+data: {'id': 'chatcmpl-1732497986', 'object': 'chat.completion.chunk', 'created': 1732497986, 'model': 'glm-4-long', 'choices': [{'index': 0, 'delta': {'content': '？'}}]}
+
+data: {'id': 'chatcmpl-1732497986', 'object': 'chat.completion.chunk', 'created': 1732497986, 'model': 'glm-4-long', 'choices': [{'index': 0, 'delta': {'content': '比如'}}]}
+
+data: {'id': 'chatcmpl-1732497986', 'object': 'chat.completion.chunk', 'created': 1732497986, 'model': 'glm-4-long', 'choices': [{'index': 0, 'delta': {'content': '奖学金'}}]}
+
+data: {'id': 'chatcmpl-1732497986', 'object': 'chat.completion.chunk', 'created': 1732497986, 'model': 'glm-4-long', 'choices': [{'index': 0, 'delta': {'content': '、'}}]}
+
+data: {'id': 'chatcmpl-1732497986', 'object': 'chat.completion.chunk', 'created': 1732497986, 'model': 'glm-4-long', 'choices': [{'index': 0, 'delta': {'content': '专业'}}]}
+
+data: {'id': 'chatcmpl-1732497986', 'object': 'chat.completion.chunk', 'created': 1732497986, 'model': 'glm-4-long', 'choices': [{'index': 0, 'delta': {'content': '设置'}}]}
+
+data: {'id': 'chatcmpl-1732497986', 'object': 'chat.completion.chunk', 'created': 1732497986, 'model': 'glm-4-long', 'choices': [{'index': 0, 'delta': {'content': '、'}}]}
+
+data: {'id': 'chatcmpl-1732497986', 'object': 'chat.completion.chunk', 'created': 1732497986, 'model': 'glm-4-long', 'choices': [{'index': 0, 'delta': {'content': '校园'}}]}
+
+data: {'id': 'chatcmpl-1732497986', 'object': 'chat.completion.chunk', 'created': 1732497986, 'model': 'glm-4-long', 'choices': [{'index': 0, 'delta': {'content': '环境'}}]}
+
+data: {'id': 'chatcmpl-1732497986', 'object': 'chat.completion.chunk', 'created': 1732497986, 'model': 'glm-4-long', 'choices': [{'index': 0, 'delta': {'content': '等'}}]}
+
+data: {'id': 'chatcmpl-1732497986', 'object': 'chat.completion.chunk', 'created': 1732497986, 'model': 'glm-4-long', 'choices': [{'index': 0, 'delta': {'content': '。'}}]}
+
+data: {'id': 'chatcmpl-1732497986', 'object': 'chat.completion.chunk', 'created': 1732497986, 'model': 'glm-4-long', 'choices': [{'index': 0, 'delta': {'content': '我会'}}]}
+
+data: {'id': 'chatcmpl-1732497986', 'object': 'chat.completion.chunk', 'created': 1732497986, 'model': 'glm-4-long', 'choices': [{'index': 0, 'delta': {'content': '尽力'}}]}
+
+data: {'id': 'chatcmpl-1732497986', 'object': 'chat.completion.chunk', 'created': 1732497986, 'model': 'glm-4-long', 'choices': [{'index': 0, 'delta': {'content': '为您提供'}}]}
+
+data: {'id': 'chatcmpl-1732497986', 'object': 'chat.completion.chunk', 'created': 1732497986, 'model': 'glm-4-long', 'choices': [{'index': 0, 'delta': {'content': '帮助'}}]}
+
+data: {'id': 'chatcmpl-1732497986', 'object': 'chat.completion.chunk', 'created': 1732497986, 'model': 'glm-4-long', 'choices': [{'index': 0, 'delta': {'content': '。'}}]}
+
+data: [DONE]
+```
