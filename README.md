@@ -37,13 +37,9 @@ id,name,base_ids,max_ref(引用token上限),min_cor(相关度下限),
 q_model_id(问题优化模型id),q_prompt(问题优化的提示),
 a_model_id(答案生成模型id),a_prompt(答案生成的提示，可能需要一些变量指代知识库的知识)
 
-### history
-
-存储对话历史，包含id，flag，time，agent_id
-
 ### message
 
-存储对话内容，包含id，time，history_id，role，content，关联history的id字段
+存储对话内容，包含id，time，session_id，role，content
 
 
 
