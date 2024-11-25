@@ -23,3 +23,7 @@ admin_router.include_router(knowledgecontent_router)
 
 from admin.controller.agent import router as agent_router
 admin_router.include_router(agent_router)
+
+
+from admin.controller.setting import router as setting_router
+admin_router.include_router(setting_router)
