@@ -4,7 +4,7 @@ from fastapi.templating import Jinja2Templates
 from admin.utils.commonModel import ResponseModel
 from admin.utils.decorators import login_required
 from models.AgentModel import AgentModel
-from models.ModelModel import ModelModel 
+from models.ModelModel import ModelModel
 
 import os
 
@@ -26,7 +26,7 @@ async def agent_list(request: Request):
 @login_required
 async def agent_form(request: Request):
     model_model = ModelModel()
-    models = model_model.get_options_list("id","name")  # 获取所有模型数据
+    models = model_model.get_options_list("id","name",{"model_type":1})  # 获取所有模型数据
     print(models)
     return templates.TemplateResponse("agent_form.html", {"request": request, "models": models})
 # 搜索Agent
