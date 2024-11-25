@@ -3228,6 +3228,7 @@
                     }
                 ]
             });
+            /*
             const registerSW = () => {
                 if ("serviceWorker" in navigator) {
                     navigator.serviceWorker.register("/static/sw.js" + location.search).then(reg => console.log("Service worker register succeeded"),
@@ -3235,6 +3236,7 @@
                 }
             };
             window.addEventListener("load", () => registerSW());
+            */
             const isMobile = navigator.userAgent.match(/iPhone|iPad|iPod|Android|BlackBerry|webOS/);
             if (isMobile) {
                 const script = document.createElement("script");
@@ -6086,7 +6088,7 @@
             }
             const folderAddChat = (folderIdx, headEle) => {
                 endAll();
-                let chat = { name: translations[locale]["newChatName"], data: [] };
+                let chat = { name: translations[locale]["newChatName"], data: [], session_id:generateRandomString(64) };
                 chatsData.push(chat);
                 activeChatIdx = chatsData.length - 1;
                 folderData[folderIdx].idxs.push(activeChatIdx);
@@ -6186,8 +6188,20 @@
                 chatEle.onclick = chatEleEvent;
                 return chatEle;
             };
+
+            const generateRandomString = (length) => {
+                const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                const charactersLength = characters.length;
+                let result = '';
+
+                for (let i = 0; i < length; i++) {
+                    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+                }
+
+                return result;
+            }
             const addNewChat = () => {
-                let chat = { name: translations[locale]["newChatName"], data: [] };
+                let chat = { name: translations[locale]["newChatName"], data: [], session_id:generateRandomString(64) };
                 if (presetRoleData.default) chat.data.unshift({ role: "system", content: presetRoleData.default });
                 preEle.selectedIndex = 0;
                 chatsData.push(chat);
@@ -6358,7 +6372,9 @@
                 }
             }
             const activeChat = (ele) => {
+                session_id = chatsData[activeChatIdx]["session_id"];
                 data = chatsData[activeChatIdx]["data"];
+                console.log(session_id)
                 allListEle.querySelectorAll(".activeChatLi").forEach(ele => {
                     ele.classList.remove("activeChatLi");
                 })
@@ -8078,6 +8094,7 @@
             let refreshIdx;
             let currentResEle;
             let progressData = "";
+            //stream 请求
             const streamGen = async (long) => {
                 currentModelName = getModelName();
                 controller = new AbortController();
@@ -8130,7 +8147,8 @@
                             model: currentModelName,
                             stream: true,
                             temperature: roleTemp,
-                            top_p: roleNature
+                            top_p: roleNature,
+                            session_id: session_id
                         });
                     } else if (modelType === 2) {
                         dataSlice = dataSlice.map(item => {
@@ -8500,6 +8518,7 @@
                     resetRecRes();
                 }
             };
+            //按钮点击，发送消息
             const genFunc = async function () {
                 clearAutoSendTimer();
                 if (recing) {
@@ -8507,8 +8526,8 @@
                     else if (existRec === 2) toggleRecEv(false);
                     else if (!keepListenMic) toggleRecEv();
                 }
+                //当前输入消息
                 let message = inputAreaEle.value.trim();
-                // console.log(message)
                 if (message.length !== 0 && noLoading()) {
                     inputAreaEle.value = "";
                     inputAreaEle.style.height = "47px";
