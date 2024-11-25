@@ -3,7 +3,7 @@ import os
 from typing import Optional
 from fastapi import APIRouter, Request, Depends
 from fastapi.templating import Jinja2Templates
-
+from models.ConfigModel import ConfigModel
 from models.AgentModel import AgentModel
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -17,4 +17,7 @@ async def index(request: Request):
     models = agent_model.get_all()
     print(models)  # [{'id': 1, 'name': '中山大学助手'}]
     base_url = str(request.url).rstrip('/')
-    return templates.TemplateResponse("index.html", {"request": request, "base_url": base_url, "models": models})
+    
+    config_model = ConfigModel()
+    api_key = config_model.get_config("api_key")
+    return templates.TemplateResponse("index.html", {"request": request, "base_url": base_url, "models": models, "api_key":api_key})

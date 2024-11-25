@@ -2,11 +2,12 @@
 import json
 import random
 import string
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Header
 from fastapi.responses import StreamingResponse, JSONResponse
 from pydantic import BaseModel
 from typing import List, Optional, Union
 import asyncio
+from models.ConfigModel import ConfigModel
 from models.KnowledgeContentModel import KnowledgeContentModel
 from models.KnowledgeBaseModel import KnowledgeBaseModel
 from models.AgentModel import AgentModel
@@ -63,8 +64,30 @@ class ChatCompletionResponse(BaseModel):
 
 
 @router.post("/chat/completions")
-async def chat_endpoint(request: ChatRequest):
-    session_id = request.session_id if request.session_id else ''.join(random.choices(string.ascii_letters + string.digits, k=64))
+async def chat_endpoint(request: ChatRequest,
+                        authorization: Optional[str] = Header(None)):
+    # 从请求头中提取 Bearer Token
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Authorization header missing or invalid")
+    
+    provided_api_key = authorization.split("Bearer ")[1]
+    
+    # 获取配置中的 API Key
+    config_model = ConfigModel()
+    stored_api_key = config_model.get_config("api_key")
+    # 验证 API Key 是否匹配
+    if not stored_api_key or provided_api_key != stored_api_key:
+        raise HTTPException(
+            status_code=401,
+            detail={
+                "error": {
+                    "message": f"[{provided_api_key}]无效的令牌",
+                    "type": "api_error"
+                }
+            }
+        )
+    session_id = request.session_id if request.session_id else ''.join(
+        random.choices(string.ascii_letters + string.digits, k=64))
     message_model = MessageModel()
 
     agent_model = AgentModel()
@@ -142,17 +165,26 @@ async def chat_endpoint(request: ChatRequest):
 
             async def event_generator():
                 collected_response = ""
-                async for chunk in (await chat_client.chat(model=a_model['name'], messages=messages, stream=True)):
+                async for chunk in (await
+                                    chat_client.chat(model=a_model['name'],
+                                                     messages=messages,
+                                                     stream=True)):
                     delta_content = chunk.strip()
                     collected_response += delta_content
                     response = {
-                        "id": f"chatcmpl-{int(time.time())}",
-                        "object": "chat.completion.chunk",
-                        "created": int(time.time()),
-                        "model": a_model['name'],
+                        "id":
+                        f"chatcmpl-{int(time.time())}",
+                        "object":
+                        "chat.completion.chunk",
+                        "created":
+                        int(time.time()),
+                        "model":
+                        a_model['name'],
                         "choices": [{
                             "index": 0,
-                            "delta": {"content": delta_content}
+                            "delta": {
+                                "content": delta_content
+                            }
                         }],
                     }
                     yield f"data: {json.dumps(response)}\n\n"
@@ -188,13 +220,21 @@ async def chat_endpoint(request: ChatRequest):
             raise HTTPException(status_code=500, detail=str(e))
     else:
         try:
-            response_text = await chat_client.chat(model=a_model['name'], messages=messages, stream=False)
+            response_text = await chat_client.chat(model=a_model['name'],
+                                                   messages=messages,
+                                                   stream=False)
             openai_response = ChatCompletionResponse(
                 id=f"chatcmpl-{int(time.time())}",
                 created=int(time.time()),
-                choices=[Choice(index=0, message=ChoiceMessage(role="assistant", content=response_text), finish_reason="stop")],
-                usage=Usage(prompt_tokens=0, completion_tokens=len(response_text.split()), total_tokens=len(response_text.split()))
-            )
+                choices=[
+                    Choice(index=0,
+                           message=ChoiceMessage(role="assistant",
+                                                 content=response_text),
+                           finish_reason="stop")
+                ],
+                usage=Usage(prompt_tokens=0,
+                            completion_tokens=len(response_text.split()),
+                            total_tokens=len(response_text.split())))
 
             # 记录AI消息
             ai_message = {
