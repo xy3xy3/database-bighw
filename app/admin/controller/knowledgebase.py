@@ -108,3 +108,22 @@ async def knowledgebase_del(request: Request):
         code=1,
         msg="知识库 ID 不能为空"
     )
+
+# 批量删除
+@router.post("/knowledgebase/del_batch")
+@login_required
+async def batch_del(request: Request):
+    form_data = await request.form()
+    ids = form_data.get("ids[]")
+    model = KnowledgeBaseModel()
+    if ids:
+        ids = [int(id) for id in ids.split(",")]
+        model.batch_delete(ids)
+        return ResponseModel(
+            code=0,
+            msg="批量删除成功"
+        )
+    return ResponseModel(
+        code=1,
+        msg="ID 不能为空"
+    )
