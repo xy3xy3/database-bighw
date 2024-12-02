@@ -6,6 +6,8 @@ from database import db
 from models.ConfigModel import ConfigModel
 from session import create_session  # 导入会话管理函数
 import os
+from loguru import logger  # 假设使用loguru记录日志
+import traceback
 
 router = APIRouter()
 
@@ -21,26 +23,35 @@ async def login(request: Request):
 
 @router.post("/doLogin")
 async def doLogin(request: Request, response: Response):
-    form = await request.form()
-    username = form.get("username")
-    password = form.get("password")
-    config = ConfigModel()
-    admin_user = config.get_config("admin_user")
-    admin_pwd = config.get_config("admin_pwd")
-    print(f"Admin User: {admin_user}, Admin Password: {admin_pwd}")
-    # 验证账号密码
-    if username == admin_user and password == admin_pwd:
-        str = (username + password).encode()
-        auth_key = md5(str).hexdigest()
-        create_session(response, "admin_login", auth_key)  # 设置会话
-        return ResponseModel(
-            code=0,
-            msg="登录成功",
-            data={"redirect_url": "/admin/"}  # 返回重定向URL
-        )
-    else:
+    try:
+        form = await request.form()
+        username = form.get("username")
+        password = form.get("password")
+        print(f" User: {username},  Password: {password}")
+        config = ConfigModel()
+        admin_user = await config.get_config("admin_user")
+        admin_pwd = await config.get_config("admin_pwd")
+        print(f"Admin User: {admin_user}, Admin Password: {admin_pwd}")
+        # 验证账号密码
+        if username == admin_user and password == admin_pwd:
+            str = (username + password).encode()
+            auth_key = md5(str).hexdigest()
+            create_session(response, "admin_login", auth_key)  # 设置会话
+            return ResponseModel(
+                code=0,
+                msg="登录成功",
+                data={"redirect_url": "/admin/"}  # 返回重定向URL
+            )
+        else:
+            return ResponseModel(
+                code=1,
+                msg="登录失败",
+                data=None
+            )
+    except Exception as e:
+        errmsg = f"登录失败{e} {traceback.format_exc()}"
         return ResponseModel(
             code=1,
-            msg="登录失败",
+            msg=errmsg,
             data=None
         )

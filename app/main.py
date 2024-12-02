@@ -13,9 +13,11 @@ from utils import *  # 用于密码哈希等
 from database import init_db, reset_db  # 导入数据库初始化函数
 from contextlib import asynccontextmanager
 
+from database import db
 # 定义 lifespan 管理器
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    await db.init_pool()
     # 启动时执行的操作
     test = 0
     if test:
