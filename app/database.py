@@ -1,4 +1,3 @@
-import psycopg2
 from psycopg2 import pool
 from config import settings
 import logging

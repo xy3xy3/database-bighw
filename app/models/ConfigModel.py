@@ -1,4 +1,3 @@
-import psycopg2
 from psycopg2.extras import RealDictCursor
 from typing import Optional, Dict
 from database import db
