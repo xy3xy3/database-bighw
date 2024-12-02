@@ -63,18 +63,14 @@ def split_json(file_path: str, max_len: int, over_leap: int) -> List[str]:
     #   读取列表qa对
     res = []
     with open(file_path, "r", encoding="utf-8") as file:
-        for line in file:
-            line = line.strip()
-            if not line:
-                continue
-            # 解析 JSON 数据
-            json_data = json.load(line)
-            question = json_data.get("q")
-            answer = json_data.get("a")
-            if question and answer:
-                # 构建文本块
-                text_block = f"问题：{question}\n答案：{answer}"
-                res.append(text_block)
+        data = json.load(file)
+    for item in data:
+        question = item.get("question", "")
+        answer = item.get("answer", "")
+
+        # 合并问题和答案
+        merged_text = f"问题：{question}\n答案：{answer}"
+        res.append(merged_text)
 
     return res
 def split_md(file_path: str, max_len: int, over_leap: int) -> List[str]:
@@ -106,6 +102,7 @@ async def process_import_task(base_id:int,max_len: int, over_leap: int, file_pat
     ext = os.path.splitext(file_path)[1]
     if not file_path:
         res = []
+        print("文件路径为空")
         return
     if ext == ".md" or ext == ".txt":
         res = split_md(file_path, max_len, over_leap)
@@ -115,6 +112,7 @@ async def process_import_task(base_id:int,max_len: int, over_leap: int, file_pat
     aiApi = ai(embedding_model['api_key'],embedding_model['base_url'])
     model_name = embedding_model['model']
     for context in res:
+        print(f"插入{context}")
         embedding = await aiApi.embedding(model_name, context)
         data = {
             "base_id": base_id,
