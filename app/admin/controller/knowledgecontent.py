@@ -27,7 +27,7 @@ router = APIRouter()
 @login_required
 async def knowledgecontent_list(request: Request):
     model = KnowledgeBaseModel()
-    mapping = model.get_map("id","name")
+    mapping = await model.get_map("id","name")
     return templates.TemplateResponse("knowledgecontent.html", {"request": request,"mapping":mapping})
 
 # 知识库表单页面
@@ -157,7 +157,7 @@ async def knowledgecontent_search(
         conditions['base_id'] = base_id
     if keyword:
         conditions["content"] = f"%{keyword}%"  # 支持模糊查询
-    paginated_data = model.get_paginated(page=page, per_page=limit, conditions=conditions)
+    paginated_data = await model.get_paginated(page=page, per_page=limit, conditions=conditions)
     return ResponseModel(
         code=0,
         msg="Success",
@@ -193,7 +193,7 @@ async def knowledgecontent_save(request: Request):
         data = {"base_id": base_id, "content": content,
             "embedding": list_to_vector(embedding),
             "created_at": datetime.now()}
-        model.save(data)
+        await model.save(data)
         msg = "知识库内容创建成功"
 
     return ResponseModel(code=0, msg=msg)

@@ -37,7 +37,7 @@ async def model_search(
     conditions = {}
     if name:
         conditions["name"] = name
-    paginated_data = model_model.get_paginated(page=page, per_page=limit, conditions=conditions)
+    paginated_data = await model_model.get_paginated(page=page, per_page=limit, conditions=conditions)
     return ResponseModel(
         code=0,
         msg="Success",
@@ -50,7 +50,7 @@ async def model_search(
 @login_required
 async def model_save(request: Request):
     form_data = await request.form()
-    model_model = ModelModel()
+    model = ModelModel()
 
     model_id = form_data.get("id")
     if model_id:
@@ -67,7 +67,7 @@ async def model_save(request: Request):
         "api_key": api_key,
         "model_type": model_type
     }
-        model_model.update(model_id, data)
+        await model.update(model_id, data)
         msg = "模型更新成功"
     else:
         data = {
@@ -76,7 +76,7 @@ async def model_save(request: Request):
         "api_key": api_key,
         "model_type": model_type
     }
-        model_model.save(data)
+        await model.save(data)
         msg = "模型创建成功"
 
     return ResponseModel(
@@ -102,7 +102,7 @@ async def model_del(request: Request):
         code=1,
         msg="模型 ID 不能为空"
     )
-    
+
 # 批量删除
 @router.post("/model/del_batch")
 @login_required

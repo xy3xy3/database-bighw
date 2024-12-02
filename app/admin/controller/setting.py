@@ -17,7 +17,7 @@ router = APIRouter()
 async def setting(request: Request):
     try:
         config_model = ConfigModel()
-        config = config_model.get_all_configs()
+        config = await config_model.get_all_configs()
     except Exception as e:
         return {"code": 1, "msg": str(e), "data": None}
     view = {"request": request, "config": config, "title": "设置", "url": "setting"}
@@ -34,7 +34,7 @@ async def save(
         configs = {
             "api_key": api_key  # 保存 api_key
         }
-        config_model.save_configs(configs)
+        await config_model.save_configs(configs)
         return {"code": 0, "msg": "保存成功", "data": None}
     except Exception as e:
         return {"code": 1, "msg": str(e), "data": None}
