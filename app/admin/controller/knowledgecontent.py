@@ -1,5 +1,6 @@
 import asyncio
 from datetime import datetime
+import json
 from fastapi import APIRouter, File, Request, Form, UploadFile
 from typing import List, Optional
 
@@ -55,10 +56,28 @@ async def knowledgecontent_import_post(
 ):
     # 异步处理导入任务
     asyncio.create_task(process_import_task(base_id, max_len, over_leap, file_path))
-    
+
     return ResponseModel(code=0, msg="成功")
 
-def split_markdown_file(file_path: str, max_len: int, over_leap: int) -> List[str]:
+def split_json(file_path: str, max_len: int, over_leap: int) -> List[str]:
+    #   读取列表qa对
+    res = []
+    with open(file_path, "r", encoding="utf-8") as file:
+        for line in file:
+            line = line.strip()
+            if not line:
+                continue
+            # 解析 JSON 数据
+            json_data = json.load(line)
+            question = json_data.get("q")
+            answer = json_data.get("a")
+            if question and answer:
+                # 构建文本块
+                text_block = f"问题：{question}\n答案：{answer}"
+                res.append(text_block)
+
+    return res
+def split_md(file_path: str, max_len: int, over_leap: int) -> List[str]:
     """
     根据给定的文件路径、最大长度和重叠量，拆分 Markdown 文件内容。
 
@@ -72,10 +91,10 @@ def split_markdown_file(file_path: str, max_len: int, over_leap: int) -> List[st
     """
     # 加载 Markdown 文件并转换为 Document 对象
     documents = load_markdown_to_documents(file_path)
-    
+
     # 基于 token 进行拆分
     split_texts = split_documents_by_token(documents, chunk_size=max_len, chunk_overlap=over_leap)
-    
+
     return split_texts
 
 async def process_import_task(base_id:int,max_len: int, over_leap: int, file_path: Optional[str]):
@@ -83,10 +102,15 @@ async def process_import_task(base_id:int,max_len: int, over_leap: int, file_pat
     content_model = KnowledgeContentModel()
     embedding_model =knowledegebase_model.get_model_details_by_base_id(base_id)
     # 调用切割函数获取拆分后的文本列表
-    if file_path:
-        res = split_markdown_file(file_path, max_len, over_leap)
-    else:
+    # 获取文件后缀
+    ext = os.path.splitext(file_path)[1]
+    if not file_path:
         res = []
+        return
+    if ext == ".md" or ext == ".txt":
+        res = split_md(file_path, max_len, over_leap)
+    elif ext == ".json":
+        res = split_json(file_path, max_len, over_leap)
     print(res)
     aiApi = ai(embedding_model['api_key'],embedding_model['base_url'])
     model_name = embedding_model['model']
@@ -117,7 +141,7 @@ async def knowledgecontent_upload(request: Request,file: UploadFile = File(...))
         return ResponseModel(code=0, msg=file_path)
     except Exception as e:
         return ResponseModel(code=1, msg=f"文件处理失败：{str(e)}")
-    
+
 
 # 知识库内容 - 搜索
 @router.post("/knowledgecontent/search")
