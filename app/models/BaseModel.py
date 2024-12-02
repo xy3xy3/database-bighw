@@ -13,7 +13,7 @@ class BaseModel:
     async def save(self, data: dict):
         """保存数据到表中"""
         async with db.pool.connection() as conn:
-            async with conn.cursor(row_factory=DictRow) as cur:
+            async with conn.cursor(row_factory=psycopg.rows.dict_row) as cur:
                 keys = ', '.join(data.keys())
                 values = ', '.join([f"%({k})s" for k in data.keys()])
                 sql = f'INSERT INTO "{self.db_schema}"."{self.table_name}" ({keys}) VALUES ({values}) RETURNING *'
@@ -52,7 +52,7 @@ class BaseModel:
         """根据ID获取单条记录"""
         sql = f'SELECT * FROM "{self.db_schema}"."{self.table_name}" WHERE id = %s'
         async with db.pool.connection() as conn:
-            async with conn.cursor(row_factory=DictRow) as cur:
+            async with conn.cursor(row_factory=psycopg.rows.dict_row) as cur:
                 await cur.execute(sql, (id,))
                 result = await cur.fetchone()
                 return dict(result) if result else None
@@ -72,7 +72,7 @@ class BaseModel:
         if offset:
             sql += f" OFFSET {offset}"
         async with db.pool.connection() as conn:
-            async with conn.cursor(row_factory=DictRow) as cur:
+            async with conn.cursor(row_factory=psycopg.rows.dict_row) as cur:
                 await cur.execute(sql, params if params else None)
                 results = await cur.fetchall()
                 return [dict(row) for row in results]
@@ -104,10 +104,10 @@ class BaseModel:
             "total_pages": (total // per_page) + (1 if total % per_page != 0 else 0)
         }
 
-    async def get_map(self, source: str, target: str) -> Dict[Any, Any]:
+    async def get_map(self, source: str, target: str) -> dict:
         sql = f'SELECT "{source}", "{target}" FROM "{self.db_schema}"."{self.table_name}"'
         async with db.pool.connection() as conn:
-            async with conn.cursor(row_factory=DictRow) as cur:
+            async with conn.cursor(row_factory=psycopg.rows.dict_row) as cur:
                 await cur.execute(sql)
                 results = await cur.fetchall()
                 mapping = {row[source]: row[target] for row in results}
@@ -122,7 +122,7 @@ class BaseModel:
             sql += f" WHERE {where_clause}"
             params.update(conditions)
         async with db.pool.connection() as conn:
-            async with conn.cursor(row_factory=DictRow) as cur:
+            async with conn.cursor(row_factory=psycopg.rows.dict_row) as cur:
                 await cur.execute(sql, params if params else None)
                 results = await cur.fetchall()
                 return [dict(row) for row in results]

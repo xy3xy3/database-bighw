@@ -1,4 +1,5 @@
 # 修复后的 app\admin\controller\knowledgebase.py
+import traceback
 from typing import Optional
 from fastapi import APIRouter, Request, Form
 from fastapi.templating import Jinja2Templates
@@ -17,9 +18,17 @@ router = APIRouter()
 @router.get("/knowledgebase")
 @login_required
 async def knowledgebase_list(request: Request):
-    model = ModelModel()
-    mapping = model.get_map("id","name")
-    return templates.TemplateResponse("knowledgebase.html", {"request": request,"mapping":mapping})
+    try:
+        model = ModelModel()
+        mapping = await model.get_map("id","name")
+        return templates.TemplateResponse("knowledgebase.html", {"request": request,"mapping":mapping})
+    except Exception as e:
+        errmsg = f"{e} {traceback.format_exc()}"
+        return ResponseModel(
+            code=1,
+            msg=errmsg,
+            data=None
+        )
 
 # 知识库表单页面
 @router.get("/knowledgebase_form")
@@ -29,7 +38,7 @@ async def knowledgebase_form(request: Request):
     conditions = {
         "model_type":0,
     }
-    models = model_model.get_options_list("id", "name",conditions)  # 获取模型列表
+    models = await model_model.get_options_list("id", "name",conditions)  # 获取模型列表
     return templates.TemplateResponse("knowledgebase_form.html", {"request": request, "models": models})
 
 
@@ -46,7 +55,7 @@ async def knowledgebase_search(
     conditions = {}
     if name:
         conditions["name"] = name
-    paginated_data = knowledgebase_model.get_paginated(page=page, per_page=limit, conditions=conditions)
+    paginated_data = await knowledgebase_model.get_paginated(page=page, per_page=limit, conditions=conditions)
     return ResponseModel(
         code=0,
         msg="Success",
@@ -74,7 +83,7 @@ async def knowledgebase_save(request: Request):
             "description": description,
             "model_id": model_id
         }
-        knowledgebase_model.update(knowledgebase_id,data)
+        await knowledgebase_model.update(knowledgebase_id,data)
         msg = "知识库更新成功"
     else:
         data = {
@@ -82,7 +91,7 @@ async def knowledgebase_save(request: Request):
             "description": description,
             "model_id": model_id
         }
-        knowledgebase_model.save(data)
+        await knowledgebase_model.save(data)
         msg = "知识库创建成功"
 
     return ResponseModel(
@@ -99,7 +108,7 @@ async def knowledgebase_del(request: Request):
     knowledgebase_model = KnowledgeBaseModel()
 
     if knowledgebase_id:
-        knowledgebase_model.delete(int(knowledgebase_id))
+        await knowledgebase_model.delete(int(knowledgebase_id))
         return ResponseModel(
             code=0,
             msg="知识库删除成功"
@@ -118,7 +127,7 @@ async def batch_del(request: Request):
     model = KnowledgeBaseModel()
     if ids:
         ids = [int(id) for id in ids]
-        model.batch_delete(ids)
+        await model.batch_delete(ids)
         return ResponseModel(
             code=0,
             msg="批量删除成功"
