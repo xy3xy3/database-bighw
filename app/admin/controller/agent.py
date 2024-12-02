@@ -1,5 +1,5 @@
 from typing import Optional
-from fastapi import APIRouter, Request, Depends
+from fastapi import APIRouter, Form, Request, Depends
 from fastapi.templating import Jinja2Templates
 from admin.utils.commonModel import ResponseModel
 from admin.utils.decorators import login_required
@@ -32,9 +32,16 @@ async def agent_form(request: Request):
 # 搜索Agent
 @router.post("/agent/search")
 @login_required
-async def agent_search(request: Request, page: int = 1, limit: int = 10, name: Optional[str] = None):
+async def agent_search(    
+    request: Request,
+    page: int = Form(1),
+    limit: int = Form(10),
+    name: Optional[str] = Form(None)
+):
     agent_model = AgentModel()
     conditions = {}
+    if name:
+        conditions["name"] = name
     paginated_data = agent_model.get_paginated(page=page, per_page=limit, conditions=conditions)
 
     return ResponseModel(
@@ -101,4 +108,23 @@ async def agent_del(request: Request):
     return ResponseModel(
         code=1,
         msg="Agent ID 不能为空"
+    )
+
+# 批量删除
+@router.post("/agent/del_batch")
+@login_required
+async def batch_del(request: Request):
+    form_data = await request.form()
+    ids = form_data.getlist("ids[]")
+    model = AgentModel()
+    if ids:
+        ids = [int(id) for id in ids]
+        model.batch_delete(ids)
+        return ResponseModel(
+            code=0,
+            msg="批量删除成功"
+        )
+    return ResponseModel(
+        code=1,
+        msg="ID 不能为空"
     )

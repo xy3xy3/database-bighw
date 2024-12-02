@@ -58,23 +58,23 @@ async def model_save(request: Request):
     name = form_data.get("name")
     base_url = form_data.get("base_url")
     api_key = form_data.get("api_key")
-    model_type = int(form_data.get("type", 0))
+    model_type = int(form_data.get("model_type", 0))
 
     if model_id:
         data = {
-        "name": form_data.get("name"),
-        "base_url": form_data.get("base_url"),
-        "api_key": form_data.get("api_key"),
-        "model_type": int(form_data.get("type", 0))
+        "name": name,
+        "base_url": base_url,
+        "api_key": api_key,
+        "model_type": model_type
     }
         model_model.update(model_id, data)
         msg = "模型更新成功"
     else:
         data = {
-        "name": form_data.get("name"),
-        "base_url": form_data.get("base_url"),
-        "api_key": form_data.get("api_key"),
-        "model_type": int(form_data.get("type", 0))
+        "name": name,
+        "base_url": base_url,
+        "api_key": api_key,
+        "model_type": model_type
     }
         model_model.save(data)
         msg = "模型创建成功"
@@ -101,4 +101,23 @@ async def model_del(request: Request):
     return ResponseModel(
         code=1,
         msg="模型 ID 不能为空"
+    )
+    
+# 批量删除
+@router.post("/model/del_batch")
+@login_required
+async def batch_del(request: Request):
+    form_data = await request.form()
+    ids = form_data.getlist("ids[]")
+    model = ModelModel()
+    if ids:
+        ids = [int(id) for id in ids]
+        model.batch_delete(ids)
+        return ResponseModel(
+            code=0,
+            msg="批量删除成功"
+        )
+    return ResponseModel(
+        code=1,
+        msg="ID 不能为空"
     )

@@ -105,11 +105,11 @@ async def message_del(request: Request):
 @login_required
 async def message_batch_del(request: Request):
     form_data = await request.form()
-    message_ids = form_data.get("ids[]")
-    message_model = MessageModel()
-    if message_ids:
-        message_ids = [int(id) for id in message_ids.split(",")]
-        message_model.batch_delete(message_ids)
+    ids = form_data.getlist("ids[]")
+    model = MessageModel()
+    if ids:
+        ids = [int(id) for id in ids]
+        model.batch_delete(ids)
         return ResponseModel(
             code=0,
             msg="消息批量删除成功"

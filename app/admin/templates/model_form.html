@@ -5,7 +5,7 @@
     {{ input_field('模型名称', 'name', '请输入模型名称', required=True) }}
     {{ input_field('基础URL', 'base_url', '请输入基础URL', required=True) }}
     {{ input_field('API密钥', 'api_key', '请输入API密钥', required=True) }}
-    {{ select_field('类型', 'type', [
+    {{ select_field('类型', 'model_type', [
         {'value': '0', 'label': 'embedding'},
         {'value': '1', 'label': 'chat'}
     ], required=True) }}
