@@ -37,7 +37,7 @@ async def message_search(
     conditions = {}
     if session_id:
         conditions["session_id"] = session_id
-    paginated_data = message_model.get_paginated(page=page, per_page=limit, conditions=conditions)
+    paginated_data = await message_model.get_paginated(page=page, per_page=limit, conditions=conditions)
 
     return ResponseModel(
         code=0,
@@ -65,7 +65,7 @@ async def message_save(request: Request):
             "role": role,
             "content": content
         }
-        message_model.update(message_id, data)
+        await message_model.update(message_id, data)
         msg = "消息更新成功"
     else:
         data = {
@@ -73,7 +73,7 @@ async def message_save(request: Request):
             "role": role,
             "content": content
         }
-        message_model.save(data)
+        await message_model.save(data)
         msg = "消息创建成功"
 
     return ResponseModel(
@@ -90,7 +90,7 @@ async def message_del(request: Request):
     message_model = MessageModel()
 
     if message_id:
-        message_model.delete(message_id)
+        await message_model.delete(message_id)
         return ResponseModel(
             code=0,
             msg="消息删除成功"
@@ -109,7 +109,7 @@ async def message_batch_del(request: Request):
     model = MessageModel()
     if ids:
         ids = [int(id) for id in ids]
-        model.batch_delete(ids)
+        await model.batch_delete(ids)
         return ResponseModel(
             code=0,
             msg="消息批量删除成功"

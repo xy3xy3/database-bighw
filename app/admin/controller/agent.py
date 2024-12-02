@@ -18,21 +18,21 @@ router = APIRouter()
 @login_required
 async def agent_list(request: Request):
     model = ModelModel()
-    mapping = model.get_map("id","name")
+    mapping = await model.get_map("id","name")
     return templates.TemplateResponse("agent.html",  {"request": request,"mapping":mapping})
 
 # Agent表单页面
 @router.get("/agent_form")
 @login_required
 async def agent_form(request: Request):
-    model_model = ModelModel()
-    models = model_model.get_options_list("id","name",{"model_type":1})  # 获取所有模型数据
+    model = ModelModel()
+    models = await model.get_options_list("id","name",{"model_type":1})  # 获取所有模型数据
     print(models)
     return templates.TemplateResponse("agent_form.html", {"request": request, "models": models})
 # 搜索Agent
 @router.post("/agent/search")
 @login_required
-async def agent_search(    
+async def agent_search(
     request: Request,
     page: int = Form(1),
     limit: int = Form(10),
@@ -42,7 +42,7 @@ async def agent_search(
     conditions = {}
     if name:
         conditions["name"] = name
-    paginated_data = agent_model.get_paginated(page=page, per_page=limit, conditions=conditions)
+    paginated_data = await agent_model.get_paginated(page=page, per_page=limit, conditions=conditions)
 
     return ResponseModel(
         code=0,
@@ -80,10 +80,10 @@ async def agent_save(request: Request):
     }
 
     if agent_id:
-        agent_model.update(agent_id, data)
+        await agent_model.update(agent_id, data)
         msg = "Agent更新成功"
     else:
-        agent_model.save(data)
+        await agent_model.save(data)
         msg = "Agent创建成功"
 
     return ResponseModel(
@@ -100,7 +100,7 @@ async def agent_del(request: Request):
     agent_model = AgentModel()
 
     if agent_id:
-        agent_model.delete_agent(agent_id)
+        await agent_model.delete_agent(agent_id)
         return ResponseModel(
             code=0,
             msg="Agent删除成功"
@@ -119,7 +119,7 @@ async def batch_del(request: Request):
     model = AgentModel()
     if ids:
         ids = [int(id) for id in ids]
-        model.batch_delete(ids)
+        await model.batch_delete(ids)
         return ResponseModel(
             code=0,
             msg="批量删除成功"

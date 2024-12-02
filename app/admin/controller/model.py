@@ -33,11 +33,11 @@ async def model_search(
     name: Optional[str] = Form(None)
 ):
     print(name)
-    model_model = ModelModel()
+    model = ModelModel()
     conditions = {}
     if name:
         conditions["name"] = name
-    paginated_data = await model_model.get_paginated(page=page, per_page=limit, conditions=conditions)
+    paginated_data = await model.get_paginated(page=page, per_page=limit, conditions=conditions)
     return ResponseModel(
         code=0,
         msg="Success",
@@ -90,10 +90,10 @@ async def model_save(request: Request):
 async def model_del(request: Request):
     form_data = await request.form()
     model_id = form_data.get("id")
-    model_model = ModelModel()
+    model = ModelModel()
 
     if model_id:
-        model_model.delete(int(model_id))
+        model.delete(int(model_id))
         return ResponseModel(
             code=0,
             msg="模型删除成功"

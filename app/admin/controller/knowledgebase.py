@@ -34,11 +34,11 @@ async def knowledgebase_list(request: Request):
 @router.get("/knowledgebase_form")
 @login_required
 async def knowledgebase_form(request: Request):
-    model_model = ModelModel()  # 实例化模型数据访问对象
+    model = ModelModel()  # 实例化模型数据访问对象
     conditions = {
         "model_type":0,
     }
-    models = await model_model.get_options_list("id", "name",conditions)  # 获取模型列表
+    models = await model.get_options_list("id", "name",conditions)  # 获取模型列表
     return templates.TemplateResponse("knowledgebase_form.html", {"request": request, "models": models})
 
 
