@@ -89,7 +89,11 @@ class BaseModel:
             async with conn.cursor(row_factory=psycopg.rows.dict_row) as cur:
                 await cur.execute(sql, params if params else None)
                 result = await cur.fetchone()
-                return result[0] if result else 0
+                print(f"Result: {result}")  # Debugging statement
+                if result is not None and len(result) > 0:
+                    return int(result[0])
+                else:
+                    return 0
 
     async def get_paginated(self, page: int = 1, per_page: int = 10, conditions: Optional[dict] = None):
         """获取分页数据"""

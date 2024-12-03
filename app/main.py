@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+
+import logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 import os
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
@@ -18,8 +22,6 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from database import db
 
-import logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # 定义 lifespan 管理器
 @asynccontextmanager
@@ -27,7 +29,7 @@ async def lifespan(app: FastAPI):
     await db.init_pool()
     # 启动时执行的操作
     test = 0
-    print(f"test:{test}")
+    logging.info(f"test:{test}")
     if test:
         reset_db()
         init_db()
@@ -95,7 +97,6 @@ HOME_STATIC_DIR = os.path.join(BASE_DIR, "app", "home", "static")
 app.mount("/static", StaticFiles(directory=HOME_STATIC_DIR), name="home_static")
 
 app.mount("/", home_app)
-
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="127.0.0.1", port=666, reload=True,log_level="debug")

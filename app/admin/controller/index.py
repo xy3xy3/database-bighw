@@ -16,7 +16,6 @@ router = APIRouter()
 @router.get("/")
 @login_required
 async def index(request: Request):
-    logging.info(11111111111)
     return templates.TemplateResponse("index.html", {"request": request})
 
 @router.get("/console")

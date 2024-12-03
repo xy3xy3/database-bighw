@@ -51,17 +51,25 @@ async def knowledgebase_search(
     limit: int = Form(10),
     name: Optional[str] = Form(None)
 ):
-    knowledgebase_model = KnowledgeBaseModel()
-    conditions = {}
-    if name:
-        conditions["name"] = name
-    paginated_data = await knowledgebase_model.get_paginated(page=page, per_page=limit, conditions=conditions)
-    return ResponseModel(
-        code=0,
-        msg="Success",
-        data=paginated_data["data"],
-        count=paginated_data["total"]
-    )
+    try:
+        knowledgebase_model = KnowledgeBaseModel()
+        conditions = {}
+        if name:
+            conditions["name"] = name
+        paginated_data = await knowledgebase_model.get_paginated(page=page, per_page=limit, conditions=conditions)
+        return ResponseModel(
+            code=0,
+            msg="Success",
+            data=paginated_data["data"],
+            count=paginated_data["total"]
+        )
+    except Exception as e:
+        errmsg = f"{e} {traceback.format_exc()}"
+        return ResponseModel(
+            code=1,
+            msg=errmsg,
+            data=None
+        )
 
 # 保存知识库
 @router.post("/knowledgebase/save")
