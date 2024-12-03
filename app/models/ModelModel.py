@@ -1,5 +1,7 @@
+import psycopg
 from models.BaseModel import BaseModel
 from database import db
+
 class ModelModel(BaseModel):
     table_name = "model"
 
@@ -10,7 +12,7 @@ class ModelModel(BaseModel):
         """根据ID获取模型信息"""
         sql = f'SELECT * FROM "{self.table_name}" WHERE id = %s;'
         async with db.pool.connection() as conn:
-            async with conn.cursor() as cur:
+            async with conn.cursor(row_factory=psycopg.rows.dict_row) as cur:
                 await cur.execute(sql, (id,))
                 model = await cur.fetchone()
                 return model

@@ -86,7 +86,7 @@ class BaseModel:
             sql += f" WHERE {where_clause}"
             params.update(conditions)
         async with db.pool.connection() as conn:
-            async with conn.cursor() as cur:
+            async with conn.cursor(row_factory=psycopg.rows.dict_row) as cur:
                 await cur.execute(sql, params if params else None)
                 result = await cur.fetchone()
                 return result[0] if result else 0

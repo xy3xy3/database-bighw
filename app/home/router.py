@@ -14,10 +14,10 @@ home_router = APIRouter()
 @home_router.get("/")
 async def index(request: Request):
     agent_model = AgentModel()
-    models = agent_model.get_all()
+    models = await agent_model.get_all()
     print(models)  # [{'id': 1, 'name': '中山大学助手'}]
     base_url = str(request.url).rstrip('/')
-    
+
     config_model = ConfigModel()
-    api_key = config_model.get_config("api_key")
+    api_key = await config_model.get_config("api_key")
     return templates.TemplateResponse("index.html", {"request": request, "base_url": base_url, "models": models, "api_key":api_key})

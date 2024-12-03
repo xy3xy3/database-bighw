@@ -1,3 +1,4 @@
+import psycopg
 from utils import list_to_vector
 from models.BaseModel import BaseModel
 from typing import List, Optional
@@ -24,7 +25,7 @@ class KnowledgeContentModel(BaseModel):
             sql += f' WHERE base_id IN ({base_ids_str})'
         sql += f' ORDER BY embedding <-> %s LIMIT %s'
         async with db.pool.connection() as conn:
-            async with conn.cursor() as cur:
+            async with conn.cursor(row_factory=psycopg.rows.dict_row) as cur:
                 await cur.execute(sql, (embedding_str, top_n))
                 return await cur.fetchall()
 

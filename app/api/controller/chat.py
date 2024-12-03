@@ -2,6 +2,7 @@
 import json
 import random
 import string
+import traceback
 from fastapi import APIRouter, HTTPException, Header
 from fastapi.responses import StreamingResponse, JSONResponse
 from pydantic import BaseModel
@@ -66,109 +67,108 @@ class ChatCompletionResponse(BaseModel):
 @router.post("/chat/completions")
 async def chat_endpoint(request: ChatRequest,
                         authorization: Optional[str] = Header(None)):
-    # 从请求头中提取 Bearer Token
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Authorization header missing or invalid")
-    
-    provided_api_key = authorization.split("Bearer ")[1]
-    
-    # 获取配置中的 API Key
-    config_model = ConfigModel()
-    stored_api_key = config_model.get_config("api_key")
-    # 验证 API Key 是否匹配
-    if not stored_api_key or provided_api_key != stored_api_key:
-        raise HTTPException(
-            status_code=401,
-            detail={
-                "error": {
-                    "message": f"[{provided_api_key}]无效的令牌",
-                    "type": "api_error"
+    try:
+        # 从请求头中提取 Bearer Token
+        if not authorization or not authorization.startswith("Bearer "):
+            raise HTTPException(status_code=401, detail="Authorization header missing or invalid")
+
+        provided_api_key = authorization.split("Bearer ")[1]
+        print(provided_api_key)
+        # 获取配置中的 API Key
+        config_model = ConfigModel()
+        stored_api_key = await config_model.get_config("api_key")
+        # 验证 API Key 是否匹配
+        if not stored_api_key or provided_api_key != stored_api_key:
+            raise HTTPException(
+                status_code=401,
+                detail={
+                    "error": {
+                        "message": f"[{provided_api_key}]无效的令牌",
+                        "type": "api_error"
+                    }
                 }
-            }
-        )
-    session_id = request.session_id if request.session_id else ''.join(
-        random.choices(string.ascii_letters + string.digits, k=64))
-    message_model = MessageModel()
+            )
+        session_id = request.session_id if request.session_id else ''.join(
+            random.choices(string.ascii_letters + string.digits, k=64))
+        message_model = MessageModel()
 
-    agent_model = AgentModel()
-    if request.model.startswith("gpt-"):
-        id = 1
-    else:
-        id = int(request.model)
-    agent = agent_model.get_agent_by_id(id)
-    if not agent:
-        raise HTTPException(status_code=404, detail="Agent not found")
-    top_n = agent['top_n']
-    #  对话模型
-    a_model = agent['a_model']
-    if a_model['type'] != 1:
-        raise HTTPException(status_code=400, detail="指定的模型不是对话模型")
-
-    # 初始化 AI 客户端
-    chat_client = ai(api_key=a_model['api_key'], base_url=a_model['base_url'])
-    # 搜索消息
-    questions = []
-    # 知识集合
-    knowledges = []
-    # 准备消息
-    messages = []
-    for msg in request.messages:
-        if isinstance(msg.content, list):  # 如果 content 是复杂对象列表
-            combined_text = " ".join(item.text
-                                     for item in msg.content)  # 拼接为字符串
-            messages.append({"role": msg.role, "content": combined_text})
+        agent_model = AgentModel()
+        if request.model.startswith("gpt-"):
+            id = 1
         else:
-            messages.append({"role": msg.role, "content": msg.content})
+            id = int(request.model)
+        agent = await agent_model.get_agent_by_id(id)
+        if not agent:
+            raise HTTPException(status_code=404, detail="Agent not found")
+        top_n = agent['top_n']
+        #  对话模型
+        a_model = agent['a_model']
+        if a_model['type'] != 1:
+            raise HTTPException(status_code=400, detail="指定的模型不是对话模型")
 
-    # 问题优化模型
-    q_model = agent['q_model']
-    print(q_model)
-    if q_model['type'] != 1:
-        raise HTTPException(status_code=400, detail="指定的模型不是问题优化模型")
-    q_client = ai(api_key=q_model['api_key'], base_url=q_model['base_url'])
-    q_prompt = agent['q_prompt']
-    questions = await questions_optimization(client=q_client,
-                                             model=q_model['name'],
-                                             messages=messages)
-    origin_question = messages[-1]['content']
-    if isinstance(questions, list):
-        questions = [item['question'] for item in questions]
-    elif isinstance(questions, dict):
-        print(questions)
-        if questions.get("questions") and isinstance(
-                questions.get("questions"), list):
-            questions = [
-                item['question'] for item in questions.get("questions")
-            ]
-        elif questions.get("question") and isinstance(
-                questions.get("question"), str):
-            questions = [questions.get("question"), origin_question]
+        # 初始化 AI 客户端
+        chat_client = ai(api_key=a_model['api_key'], base_url=a_model['base_url'])
+        # 搜索消息
+        questions = []
+        # 知识集合
+        knowledges = []
+        # 准备消息
+        messages = []
+        for msg in request.messages:
+            if isinstance(msg.content, list):  # 如果 content 是复杂对象列表
+                combined_text = " ".join(item.text
+                                        for item in msg.content)  # 拼接为字符串
+                messages.append({"role": msg.role, "content": combined_text})
+            else:
+                messages.append({"role": msg.role, "content": msg.content})
+
+        # 问题优化模型
+        q_model = agent['q_model']
+        print(q_model)
+        if q_model['type'] != 1:
+            raise HTTPException(status_code=400, detail="指定的模型不是问题优化模型")
+        q_client = ai(api_key=q_model['api_key'], base_url=q_model['base_url'])
+        q_prompt = agent['q_prompt']
+        questions = await questions_optimization(client=q_client,
+                                                model=q_model['name'],
+                                                messages=messages)
+        origin_question = messages[-1]['content']
+        if isinstance(questions, list):
+            questions = [item['question'] for item in questions]
+        elif isinstance(questions, dict):
+            print(questions)
+            if questions.get("questions") and isinstance(
+                    questions.get("questions"), list):
+                questions = [
+                    item['question'] for item in questions.get("questions")
+                ]
+            elif questions.get("question") and isinstance(
+                    questions.get("question"), str):
+                questions = [questions.get("question"), origin_question]
+            else:
+                questions = [origin_question]
         else:
             questions = [origin_question]
-    else:
-        questions = [origin_question]
-    user_message = {
-        "session_id": session_id,
-        "role": "user",
-        "content": messages[-1]['content']
-    }
-    message_model.save(user_message)
-    base_ids = agent['base_ids'].split(",")
-    a_prompt = agent['a_prompt']
-    if len(base_ids) > 0:
-        knowledges = await get_knowledges(base_ids, questions, top_n)
-        knowledges_text = "\n\n".join(knowledges)
-        messages[-1]['content'] = f"{a_prompt}\n\n使用下面<data></data>的知识辅助回答问题" \
-        f"<data>{knowledges_text}</data>\n用户问题:\n'''{origin_question}'''"
-    if request.stream:
-        try:
-
+        user_message = {
+            "session_id": session_id,
+            "role": "user",
+            "content": messages[-1]['content']
+        }
+        await message_model.save(user_message)
+        base_ids = agent['base_ids'].split(",")
+        a_prompt = agent['a_prompt']
+        if len(base_ids) > 0:
+            knowledges = await get_knowledges(base_ids, questions, top_n)
+            knowledges_text = "\n\n".join(knowledges)
+            messages[-1]['content'] = f"{a_prompt}\n\n使用下面<data></data>的知识辅助回答问题" \
+            f"<data>{knowledges_text}</data>\n用户问题:\n'''{origin_question}'''"
+        if request.stream:
             async def event_generator():
                 collected_response = ""
                 async for chunk in (await
                                     chat_client.chat(model=a_model['name'],
-                                                     messages=messages,
-                                                     stream=True)):
+                                                    messages=messages,
+                                                    stream=True)):
                     delta_content = chunk.strip()
                     collected_response += delta_content
                     response = {
@@ -194,7 +194,7 @@ async def chat_endpoint(request: ChatRequest,
                     "role": "assistant",
                     "content": collected_response
                 }
-                message_model.save(ai_message)
+                await message_model.save(ai_message)
                 # 结束标记
                 response = {
                     "id":
@@ -215,22 +215,19 @@ async def chat_endpoint(request: ChatRequest,
                 yield f"data: [DONE]\n\n"
 
             return StreamingResponse(event_generator(),
-                                     media_type="text/event-stream")
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
-    else:
-        try:
+                                    media_type="text/event-stream")
+        else:
             response_text = await chat_client.chat(model=a_model['name'],
-                                                   messages=messages,
-                                                   stream=False)
+                                                messages=messages,
+                                                stream=False)
             openai_response = ChatCompletionResponse(
                 id=f"chatcmpl-{int(time.time())}",
                 created=int(time.time()),
                 choices=[
                     Choice(index=0,
-                           message=ChoiceMessage(role="assistant",
-                                                 content=response_text),
-                           finish_reason="stop")
+                        message=ChoiceMessage(role="assistant",
+                                                content=response_text),
+                        finish_reason="stop")
                 ],
                 usage=Usage(prompt_tokens=0,
                             completion_tokens=len(response_text.split()),
@@ -242,11 +239,13 @@ async def chat_endpoint(request: ChatRequest,
                 "role": "assistant",
                 "content": response_text
             }
-            message_model.save(ai_message)
+            await message_model.save(ai_message)
 
             return JSONResponse(content=openai_response.dict())
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        errmsg = f"{e} {traceback.format_exc()}"
+        print(errmsg)
+        raise HTTPException(status_code=500, detail=errmsg)
 
 
 # 根据历史消息，获取优化后的问题集合
@@ -383,7 +382,7 @@ async def get_knowledges(base_ids: list, questions: list, top_n: int) -> list:
     # TODO:进一步并行 优化查询速度
     base_model = KnowledgeBaseModel()
     content_model = KnowledgeContentModel()
-    embedding_model = base_model.get_model_details_by_base_id(base_ids[0])
+    embedding_model = await base_model.get_model_details_by_base_id(base_ids[0])
     embedApi = ai(embedding_model['api_key'], embedding_model['base_url'])
     embedding_list = []
     # 得到多个问题的embedding
@@ -394,7 +393,7 @@ async def get_knowledges(base_ids: list, questions: list, top_n: int) -> list:
     # 对每个base_id，用每个embedding去搜索
     res = []
     for embedding in embedding_list:
-        contents = content_model.get_nearest_neighbors(embedding,
+        contents = await content_model.get_nearest_neighbors(embedding,
                                                        top_n=top_n,
                                                        base_ids=base_ids)
         # 确保 contents 中的每个元素都是字符串类型
