@@ -1,5 +1,5 @@
 import os
-from langchain.document_loaders import UnstructuredMarkdownLoader
+from langchain_community.document_loaders import UnstructuredMarkdownLoader
 from langchain.text_splitter import TokenTextSplitter
 from langchain.docstore.document import Document
 from typing import List
@@ -17,13 +17,13 @@ def load_markdown_to_documents(markdown_path: str, mode: str = "single") -> List
     """
     # 创建加载器
     loader = UnstructuredMarkdownLoader(markdown_path, mode=mode)
-    
+
     # 加载 Markdown 文件
     data = loader.load()
-    
+
     # 确保返回的是 Document 对象列表
     assert all(isinstance(doc, Document) for doc in data), "加载的文档不是 Document 对象"
-    
+
     return data
 
 def split_documents_by_token(documents: List[Document], chunk_size: int = 100, chunk_overlap: int = 20) -> List[str]:
@@ -42,10 +42,10 @@ def split_documents_by_token(documents: List[Document], chunk_size: int = 100, c
         chunk_size=chunk_size, chunk_overlap=chunk_overlap
     )
     split_texts = []
-    
+
     for document in documents:
         split_texts.extend(text_splitter.split_text(document.page_content))
-    
+
     return split_texts
 
 def process_all_markdown_files(upload_folder: str) -> List[str]:
@@ -59,26 +59,26 @@ def process_all_markdown_files(upload_folder: str) -> List[str]:
     List[str]: 合并后的所有文本块的字符串列表。
     """
     all_split_texts: List[str] = []
-    
+
     # 遍历文件夹中的所有文件
     for filename in os.listdir(upload_folder):
         if filename.endswith(".md"):
             file_path = os.path.join(upload_folder, filename)
             print(f"正在处理文件: {file_path}")
-            
+
             try:
                 # 加载 Markdown 文件并转换为 Document 对象
                 documents = load_markdown_to_documents(file_path)
-                
+
                 # 基于 token 进行拆分
                 token_based_texts = split_documents_by_token(documents)
-                
+
                 # 将当前文件的拆分文本块添加到总列表中
                 all_split_texts.extend(token_based_texts)
-                
+
             except Exception as e:
                 print(f"处理文件 {file_path} 时出错: {e}")
-    
+
     return all_split_texts
 
 def main() -> List[str]:
@@ -90,15 +90,15 @@ def main() -> List[str]:
     """
     # 指定 upload 文件夹的路径
     upload_folder = "app/upload"
-    
+
     # 处理所有 Markdown 文件并获取合并后的文本块列表
     combined_texts = process_all_markdown_files(upload_folder)
-    
+
     # # 打印拆分后的文本块数量
     # print(f"总共拆分出 {len(combined_texts)} 个文本块。")
-    
+
     # print(combined_texts)
-    
+
     # 返回合并后的文本块列表
     return combined_texts
 

@@ -3,10 +3,6 @@ from typing import Optional, Dict
 from database import db
 from config import settings
 import logging
-
-# 配置日志记录（如果尚未在 database.py 中配置）
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
 class ConfigModel:
     table_name = "config"
 

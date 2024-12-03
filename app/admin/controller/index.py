@@ -1,3 +1,4 @@
+import logging
 from typing import Optional
 from fastapi import APIRouter, Request, Depends
 from fastapi.templating import Jinja2Templates
@@ -15,6 +16,7 @@ router = APIRouter()
 @router.get("/")
 @login_required
 async def index(request: Request):
+    logging.info(11111111111)
     return templates.TemplateResponse("index.html", {"request": request})
 
 @router.get("/console")

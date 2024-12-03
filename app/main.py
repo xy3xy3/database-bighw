@@ -12,20 +12,22 @@ from fastapi.middleware.cors import CORSMiddleware
 from utils import *  # 用于密码哈希等
 from database import init_db, reset_db  # 导入数据库初始化函数
 from contextlib import asynccontextmanager
-import logging
-
-logging.basicConfig(level=logging.DEBUG)
 from fastapi import Request
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from database import db
+
+import logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 # 定义 lifespan 管理器
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await db.init_pool()
     # 启动时执行的操作
     test = 0
+    print(f"test:{test}")
     if test:
         reset_db()
         init_db()
@@ -33,7 +35,7 @@ async def lifespan(app: FastAPI):
     # 应用关闭时执行的操作（如果有）
 
 # 使用 lifespan 管理生命周期
-app = FastAPI(title="AI AGENT", lifespan=lifespan, debug=True)
+app = FastAPI(lifespan=lifespan)
 # 添加CORS中间件
 app.add_middleware(
     CORSMiddleware,
@@ -96,4 +98,4 @@ app.mount("/", home_app)
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="127.0.0.1", port=666, reload=True)
+    uvicorn.run("main:app", host="127.0.0.1", port=666, reload=True,log_level="debug")

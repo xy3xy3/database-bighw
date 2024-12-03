@@ -4,9 +4,6 @@ import psycopg_pool
 from config import settings
 import logging
 
-# 配置日志记录
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
 class Database:
     def __init__(self):
         logging.info(f"Database schema: {settings.db_schema}")
