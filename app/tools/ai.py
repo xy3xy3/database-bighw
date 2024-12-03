@@ -37,7 +37,9 @@ class ai:
                     "content": user_prompt
                 },
             ]
-
+            if history:
+                messages = history + messages
+            logging.info(f"记录:{messages}")
             # 调用 OpenAI 接口
             response = await self.client.chat.completions.create(
                 messages=messages,
@@ -55,7 +57,7 @@ class ai:
                 json_str = match.group(1).strip()
             else:
                 json_str = content
-            print(type(json_str), json_str)
+            logging.info(f"json_str:{json_str}")
 
             json_info, json_obj = try_parse_json_object(json_str)
             if json_obj:  # 如果解析成功
@@ -83,6 +85,7 @@ class ai:
     async def chat(self, model: str, messages: list, stream: bool = False):
         """聊天方法，兼容 OpenAI 风格的 API"""
         try:
+            logging.info(f"记录:{messages}")
             res = await self.client.chat.completions.create(
                 messages=messages,
                 model=model,
@@ -122,7 +125,7 @@ async def test():
 
     model = "glm-4-flash"
     system_prompt = """用户会输入很多关于中山大学的问题，请帮忙扩展问题到1-3个，便于知识库搜索。如果用户消息带有历史记录，你需要帮忙做指代消除。
-EXAMPLE INPUT: 
+EXAMPLE INPUT:
 中山大学在哪
 EXAMPLE JSON OUTPUT:
 [
@@ -136,7 +139,7 @@ EXAMPLE JSON OUTPUT:
         "question": "中山大学往哪走"
     }
 ]
-EXAMPLE INPUT: 
+EXAMPLE INPUT:
 history:
 中山大学校长是谁
 output:
