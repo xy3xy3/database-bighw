@@ -1,4 +1,5 @@
 # 修复后的 app\admin\controller\knowledgebase.py
+import logging
 import traceback
 from typing import Optional
 from fastapi import APIRouter, Request, Form
@@ -65,6 +66,7 @@ async def knowledgebase_search(
         )
     except Exception as e:
         errmsg = f"{e} {traceback.format_exc()}"
+        logging.error(errmsg)
         return ResponseModel(
             code=1,
             msg=errmsg,

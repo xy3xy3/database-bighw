@@ -1,8 +1,13 @@
+import sys
 import asyncio
 import psycopg
 import psycopg_pool
 from config import settings
 import logging
+
+# Windows 特殊处理
+if sys.platform.startswith("win"):
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 class Database:
     def __init__(self):

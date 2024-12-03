@@ -89,9 +89,8 @@ class BaseModel:
             async with conn.cursor(row_factory=psycopg.rows.dict_row) as cur:
                 await cur.execute(sql, params if params else None)
                 result = await cur.fetchone()
-                print(f"Result: {result}")  # Debugging statement
-                if result is not None and len(result) > 0:
-                    return int(result[0])
+                if result:
+                    return result['count']
                 else:
                     return 0
 
