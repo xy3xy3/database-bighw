@@ -1,0 +1,10 @@
+{% extends 'set_base.html' %}
+{% block title %}
+  修改密码
+{% endblock %}
+{% block content %}
+  {% from 'form_macros.html' import input_field %}
+    {{ input_field('旧密码', 'old_password', '请输入旧密码', type="password", required=True) }}
+    {{ input_field('新密码', 'new_password', '请输入新密码', type="password", required=True) }}
+    {{ input_field('确认新密码', 'confirm_password', '请再次输入新密码', type="password", required=True) }}
+{% endblock %}

@@ -25,5 +25,9 @@ from admin.controller.agent import router as agent_router
 admin_router.include_router(agent_router)
 
 
+
+from admin.controller.pwd import router as pwd_router
+admin_router.include_router(pwd_router)
+
 from admin.controller.setting import router as setting_router
 admin_router.include_router(setting_router)
