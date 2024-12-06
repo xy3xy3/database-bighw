@@ -3,6 +3,7 @@
 {% block header %}
   {% from 'form_macros.html' import search_field %}
   {{ search_field('会话ID', 'session_id', '请输入会话ID') }}
+  {{ search_field('Agent', 'agent_id', '请选择', 'select', options=agents, required=False) }}
 {% endblock %}
 {% block extra_js %}
 <script>
@@ -13,22 +14,30 @@
       elem: "#LAY-list",
       url: "/admin/message/search",
       cols: [
-        [
-          { type: "checkbox", fixed: "left" },
-          { field: "id", width: 80, title: "ID", sort: true },
-          { field: "session_id", title: "会话ID", width: 150 },
-          { field: "created_at", title: "创建时间", width: 150 },
-          { field: "role", title: "角色", width: 100 },
-          { field: "content", title: "内容", width: 200 },
-          {
-            title: "操作",
-            minWidth: 150,
-            align: "center",
-            fixed: "right",
-            toolbar: "#table-action-list",
+      [
+        { type: "checkbox", fixed: "left" },
+        { field: "id", width: 80, title: "ID", sort: true },
+        { field: "session_id", title: "会话ID", width: 150 },
+        {
+          field: "agent_id",
+          title: "Agent 名称",
+          width: 150,
+          templet: function (d) {
+            return {{ agent_mapping | safe }}[d.agent_id];
           },
-        ],
+        },
+        { field: "created_at", title: "创建时间", width: 150 },
+        { field: "role", title: "角色", width: 100 },
+        { field: "content", title: "内容", width: 200 },
+        {
+          title: "操作",
+          minWidth: 150,
+          align: "center",
+          fixed: "right",
+          toolbar: "#table-action-list",
+        },
       ],
+    ],
       page: true,
       limit: 10,
       text: {

@@ -1,12 +1,15 @@
-{% extends 'table_base.html' %} {% block title %} 知识库内容管理 {% endblock %}
-{% block header %} {% from 'form_macros.html' import search_field %} {{
-search_field('关键词', 'keyword', '请输入内容关键词') }} {% endblock %} {% block
-body_button %}
-<button class="layui-btn layuiadmin-btn-list" data-type="import">
-  导入文件
-</button>
+{% extends 'table_base.html' %} {% block title %}
+  知识库内容管理
+{% endblock %}
+{% block header %}
+  {% from 'form_macros.html' import search_field %}
+  {{ search_field('关键词', 'keyword', '请输入内容关键词') }}
+
+  {{ search_field('知识库', 'base_id', '请选择', 'select', options=knowledgebases, required=False) }}
+{% endblock %} {% block body_button %}
+  <button class="layui-btn layuiadmin-btn-list" data-type="import">导入文件</button>
 {% endblock %} {% block extra_js %}
-<script>
+  <script>
   var config = {
     url: "knowledgecontent",
     name: "知识库内容",
@@ -45,7 +48,7 @@ body_button %}
   };
 </script>
 
-<script>
+  <script>
   layui
     .config({
       base: "/admin/static/", // 静态资源所在路径

@@ -112,7 +112,7 @@ async def batch_del(request: Request):
     model = ModelModel()
     if ids:
         ids = [int(id) for id in ids]
-        model.batch_delete(ids)
+        await model.batch_delete(ids)
         return ResponseModel(
             code=0,
             msg="批量删除成功"

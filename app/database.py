@@ -12,7 +12,7 @@ if sys.platform.startswith("win"):
 class Database:
     def __init__(self):
         logging.info(f"Database schema: {settings.db_schema}")
-        self.pool = None  # 初始为 None，稍后在异步方法中初始化
+        self.pool = None
 
     async def init_pool(self):
         """初始化连接池"""
@@ -24,20 +24,27 @@ class Database:
         )
 
     async def get_connection(self):
+        """从连接池获取连接"""
         logging.info("从连接池获取数据库连接。")
         if not self.pool:
             await self.init_pool()
-        conn = await self.pool.acquire()
-        await conn.execute(f"SET search_path TO {settings.db_schema};")
-        return conn
+        conn = await self.pool.getconn()
+        try:
+            async with conn.cursor() as cursor:
+                await cursor.execute(f"SET search_path TO {settings.db_schema};")
+            return conn
+        except Exception as e:
+            logging.error(f"获取数据库连接时出错: {e}")
+            raise
 
     async def release_connection(self, conn):
+        """释放连接回连接池"""
         logging.info("将数据库连接释放回连接池。")
-        # 重置搜索路径或其他清理操作
-        await conn.execute("SET search_path TO public;")
-        await self.pool.release(conn)
+        if self.pool and conn:
+            await self.pool.putconn(conn)
 
     async def close_all(self):
+        """关闭所有连接"""
         logging.info("关闭连接池中的所有数据库连接。")
         if self.pool:
             await self.pool.close()
@@ -47,8 +54,9 @@ db = Database()
 async def init_db():
     """初始化数据库，创建所需的表"""
     logging.info("初始化数据库。")
-    conn = await db.get_connection()
+    conn = None
     try:
+        conn = await db.get_connection()
         async with conn.cursor() as cursor:
             # 创建 message 表
             logging.info("创建 message 表（如果不存在）。")
@@ -58,7 +66,8 @@ async def init_db():
                     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
                     session_id VARCHAR(64),
                     role VARCHAR(50),
-                    content TEXT
+                    content TEXT,
+                    agent_id INT REFERENCES agent(id) ON DELETE CASCADE
                 );
             """)
             await cursor.execute("""
@@ -82,8 +91,8 @@ async def init_db():
             await cursor.execute("""
                 CREATE TABLE IF NOT EXISTS knowledgebase (
                     id SERIAL PRIMARY KEY,
-                    name VARCHAR(255) NOT NULL,
-                    description TEXT NOT NULL,
+                    name VARCHAR(255),
+                    description TEXT,
                     model_id INT REFERENCES model(id) ON DELETE CASCADE
                 );
             """)
@@ -100,19 +109,19 @@ async def init_db():
                 );
             """)
 
-            # 创建 Config 表
+            # 创建 config 表
             logging.info("创建 config 表（如果不存在）。")
             await cursor.execute("""
-                CREATE TABLE IF NOT EXISTS "config" (
+                CREATE TABLE IF NOT EXISTS config (
                     k VARCHAR(255) PRIMARY KEY,
                     v TEXT
                 );
             """)
 
-            # 创建 Agent 表
+            # 创建 agent 表
             logging.info("创建 agent 表（如果不存在）。")
             await cursor.execute("""
-                CREATE TABLE agent (
+                CREATE TABLE IF NOT EXISTS agent (
                     id SERIAL PRIMARY KEY,
                     name VARCHAR(255) NOT NULL,
                     base_ids TEXT NOT NULL,
@@ -126,99 +135,80 @@ async def init_db():
 
             # 插入默认数据
             logging.info("插入默认记录。")
-            # 禁用唯一约束检查
             await cursor.execute("SET session_replication_role = 'replica';")
+
             # 插入模型数据
             await cursor.execute("""
                 INSERT INTO model (name, base_url, api_key, model_type)
                 VALUES
                     ('embedding-3', 'https://open.bigmodel.cn/api/paas/v4', '7305f8f725fd64362176a8cc68f1d909.fHTbqG2ArlpGP901', 0),
                     ('deepseek-chat', 'https://api.deepseek.com', 'sk-19810a0dceaf405cbb5caafd3842f0b6', 1),
-                    ('glm-4-long', 'https://open.bigmodel.cn/api/paas/v4', '7305f8f725fd64362176a8cc68f1d909.fHTbqG2ArlpGP901', 1)
-                ON CONFLICT DO NOTHING;
+                    ('glm-4-long', 'https://open.bigmodel.cn/api/paas/v4', '7305f8f725fd64362176a8cc68f1d909.fHTbqG2ArlpGP901', 1);
             """)
 
             # 插入知识库数据
             await cursor.execute("""
                 INSERT INTO knowledgebase (name, description, model_id)
                 VALUES
-                    ('中山大学知识库', '1', 1)
-                ON CONFLICT DO NOTHING;
+                    ('中山大学知识库', '1', 1);
             """)
 
-            # 插入 Agent 数据，确保 base_ids = '1'
+            # 插入 agent 数据
             await cursor.execute("""
                 INSERT INTO agent (name, base_ids, top_n, q_model_id, q_prompt, a_model_id, a_prompt)
                 VALUES
-                    ('中山大学助手', '1', 100, 2, '问题关于中山大学', 3, '回答关于中山大学问题')
-                ON CONFLICT DO NOTHING;
+                    ('中山大学助手', '1', 100, 2, '问题关于中山大学', 3, '回答关于中山大学问题');
             """)
 
-            # Config设置默认admin_user,admin_pwd
+            # 插入 config 数据
             await cursor.execute("""
-                INSERT INTO "config" (k, v)
+                INSERT INTO config (k, v)
                 VALUES
                     ('admin_user', 'admin'),
-                    ('admin_pwd', 'admin')
-                ON CONFLICT (k) DO NOTHING;
+                    ('admin_pwd', 'admin'),
+                    ('api_key', 'sk-123');
             """)
-            # 恢复外键约束检查
-            logging.info("启用外键约束检查。")
             await cursor.execute("SET session_replication_role = 'origin';")
-        await conn.commit()
-        logging.info("数据库初始化完成。")
+            await conn.commit()
+            logging.info("数据库初始化完成。")
     except Exception as e:
-        await conn.rollback()
         logging.error(f"初始化数据库时出错: {e}")
+        if conn:
+            await conn.rollback()
     finally:
-        await db.release_connection(conn)
+        if conn:
+            await db.release_connection(conn)
 
 async def reset_db():
     """重置数据库，删除所有表"""
     logging.info("重置数据库。")
-    conn = await db.get_connection()
+    conn = None
     try:
+        conn = await db.get_connection()
         async with conn.cursor() as cursor:
             # 禁用外键约束检查
             logging.info("禁用外键约束检查。")
             await cursor.execute("SET session_replication_role = 'replica';")
 
             # 按依赖关系删除表
-            logging.info("删除 agent 表（如果存在）。")
+            logging.info("删除所有表。")
             await cursor.execute("DROP TABLE IF EXISTS agent CASCADE;")
-            logging.info("删除 message 表（如果存在）。")
             await cursor.execute("DROP TABLE IF EXISTS message CASCADE;")
-            logging.info("删除 knowledge_content 表（如果存在）。")
             await cursor.execute("DROP TABLE IF EXISTS knowledge_content CASCADE;")
-            logging.info("删除 knowledgebase 表（如果存在）。")
             await cursor.execute("DROP TABLE IF EXISTS knowledgebase CASCADE;")
-            logging.info("删除 model 表（如果存在）。")
             await cursor.execute("DROP TABLE IF EXISTS model CASCADE;")
-            logging.info("删除 config 表（如果存在）。")
             await cursor.execute("DROP TABLE IF EXISTS config CASCADE;")
+
+            # 恢复外键约束检查
+            logging.info("恢复外键约束检查。")
+            await cursor.execute("SET session_replication_role = 'origin';")
 
             await conn.commit()
             logging.info("数据库重置完成。")
     except Exception as e:
-        await conn.rollback()
         logging.error(f"重置数据库时出错: {e}")
-    finally:
-        try:
-            async with conn.cursor() as cursor:
-                # 恢复外键约束检查
-                logging.info("启用外键约束检查。")
-                await cursor.execute("SET session_replication_role = 'origin';")
-                await conn.commit()
-        except Exception as e:
-            logging.error(f"恢复外键约束检查时出错: {e}")
+        if conn:
             await conn.rollback()
-        await db.release_connection(conn)
-
-# 示例调用
-# 如果需要初始化数据库，请取消注释以下代码并运行
-# async def main():
-#     await init_db()
-#     # await reset_db()
-
-# if __name__ == "__main__":
-#     asyncio.run(main())
+    finally:
+        if conn:
+            await db.release_connection(conn)

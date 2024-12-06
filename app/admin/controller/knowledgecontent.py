@@ -28,22 +28,23 @@ router = APIRouter()
 async def knowledgecontent_list(request: Request):
     model = KnowledgeBaseModel()
     mapping = await model.get_map("id","name")
-    return templates.TemplateResponse("knowledgecontent.html", {"request": request,"mapping":mapping})
+    knowledgebases = await model.get_options_list("id", "name")  # 获取知识库列表
+    return templates.TemplateResponse("knowledgecontent.html", {"request": request,"mapping":mapping, "knowledgebases": knowledgebases})
 
 # 知识库表单页面
 @router.get("/knowledgecontent_form")
 @login_required
 async def knowledgecontent_form(request: Request):
-    knowledgebase_model = KnowledgeBaseModel()  # 实例化知识库数据访问对象
-    knowledgebases = knowledgebase_model.get_options_list("id", "name")  # 获取知识库列表
+    model = KnowledgeBaseModel()  # 实例化知识库数据访问对象
+    knowledgebases = await model.get_options_list("id", "name")  # 获取知识库列表
     return templates.TemplateResponse("knowledgecontent_form.html", {"request": request, "knowledgebases": knowledgebases})
 
 # 知识库导入文件
 @router.get("/knowledgecontent_import")
 @login_required
 async def knowledgecontent_import(request: Request):
-    knowledgebase_model = KnowledgeBaseModel()  # 实例化知识库数据访问对象
-    knowledgebases = knowledgebase_model.get_options_list("id", "name")  # 获取知识库列表
+    model = KnowledgeBaseModel()  # 实例化知识库数据访问对象
+    knowledgebases = await model.get_options_list("id", "name")  # 获取知识库列表
     return templates.TemplateResponse("knowledgecontent_import.html", {"request": request, "knowledgebases": knowledgebases})
 @router.post("/knowledgecontent_import")
 @login_required
@@ -96,7 +97,7 @@ def split_md(file_path: str, max_len: int, over_leap: int) -> List[str]:
 async def process_import_task(base_id:int,max_len: int, over_leap: int, file_path: Optional[str]):
     knowledegebase_model = KnowledgeBaseModel()
     content_model = KnowledgeContentModel()
-    embedding_model =knowledegebase_model.get_model_details_by_base_id(base_id)
+    embedding_model = await knowledegebase_model.get_model_details_by_base_id(base_id)
     # 调用切割函数获取拆分后的文本列表
     # 获取文件后缀
     ext = os.path.splitext(file_path)[1]
@@ -119,7 +120,7 @@ async def process_import_task(base_id:int,max_len: int, over_leap: int, file_pat
             "content": context,
             "embedding": embedding,
         }
-        content_model.save(data)
+        await content_model.save(data)
     print("Import task completed")
 
 @router.post("/knowledgecontent_upload")
@@ -148,12 +149,13 @@ async def knowledgecontent_search(
     request: Request,
     page: int = Form(1),
     limit: int = Form(10),
-    base_id: Optional[int] = Form(None),
+    base_id: Optional[str] = Form(None),
     keyword: Optional[str] = Form(None),
 ):
     model = KnowledgeContentModel()
     conditions = {}
     if base_id:
+        base_id = int(base_id)
         conditions['base_id'] = base_id
     if keyword:
         conditions["content"] = f"%{keyword}%"  # 支持模糊查询
@@ -176,7 +178,7 @@ async def knowledgecontent_save(request: Request):
     if content_id:
         content_id = int(content_id)
     base_id = int(form_data.get("base_id"))
-    embedding_model =knowledegebase_model.get_model_details_by_base_id(base_id)
+    embedding_model = await knowledegebase_model.get_model_details_by_base_id(base_id)
     if not embedding_model:
         return ResponseModel(code=1, msg="模型配置错误")
 
@@ -207,7 +209,7 @@ async def knowledgecontent_del(request: Request):
     model = KnowledgeContentModel()
 
     if content_id:
-        model.delete(int(content_id))
+        await model.delete(int(content_id))
         return ResponseModel(code=0, msg="知识库内容删除成功")
     return ResponseModel(code=1, msg="内容 ID 不能为空")
 
@@ -220,7 +222,7 @@ async def batch_del(request: Request):
     model = KnowledgeContentModel()
     if ids:
         ids = [int(id) for id in ids]
-        model.batch_delete(ids)
+        await model.batch_delete(ids)
         return ResponseModel(
             code=0,
             msg="批量删除成功"

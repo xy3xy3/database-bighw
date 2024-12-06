@@ -65,7 +65,7 @@ async def chat_endpoint(request: ChatRequest, authorization: Optional[str] = Hea
     try:
         # 从请求头中提取 Bearer Token
         if not authorization or not authorization.startswith("Bearer "):
-            raise HTTPException(status_code=401, detail="Authorization header missing or invalid")
+            return JSONResponse(status_code=401, content={"detail": "Authorization header missing or invalid"})
 
         provided_api_key = authorization.split("Bearer ")[1]
         # 获取配置中的 API Key
@@ -73,9 +73,9 @@ async def chat_endpoint(request: ChatRequest, authorization: Optional[str] = Hea
         stored_api_key = await config_model.get_config("api_key")
         # 验证 API Key 是否匹配
         if not stored_api_key or provided_api_key != stored_api_key:
-            raise HTTPException(
+            return JSONResponse(
                 status_code=401,
-                detail={
+                content={
                     "error": {
                         "message": f"[{provided_api_key}]无效的令牌",
                         "type": "api_error"
@@ -136,7 +136,8 @@ async def chat_endpoint(request: ChatRequest, authorization: Optional[str] = Hea
         user_message = {
             "session_id": session_id,
             "role": "user",
-            "content": messages[-1]['content']
+            "content": messages[-1]['content'],
+            "agent_id":id,
         }
         await message_model.save(user_message)
         base_ids = agent['base_ids'].split(",")
@@ -168,7 +169,7 @@ async def chat_endpoint(request: ChatRequest, authorization: Optional[str] = Hea
                 end_time = time.time()
                 logging.info(f"大模型回答耗时: {end_time - start_time}秒")
                 # 记录AI消息
-                ai_message = {"session_id": session_id, "role": "assistant", "content": collected_response}
+                ai_message = {"session_id": session_id, "role": "assistant", "content": collected_response,"agent_id":id}
                 await message_model.save(ai_message)
                 # 结束标记
                 response = {

@@ -31,8 +31,8 @@ async def lifespan(app: FastAPI):
     test = 0
     logging.info(f"test:{test}")
     if test:
-        reset_db()
-        init_db()
+        await reset_db()
+        await init_db()
     yield  # 在这里切换到应用程序的运行阶段
     # 应用关闭时执行的操作（如果有）
 
