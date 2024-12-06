@@ -160,3 +160,38 @@
   caption: [密码设置],
 )
 ]
+
+== 知识库RAG搜索
+
+用户问题会先被大模型扩展为更多问题，之后调用接口Embedding，然后把向量在数据库中匹配相似的TopN个结果
+
+由于FastAPI特性，链接数据库，调用大模型接口均使用协程
+使得我们的搜索速度非常快
+#figure(
+  image("./img/quick-search.png", width: 50%),
+  caption: [RAG搜索],
+)
+== 兼容Openai API
+
+
+#slide()[
+兼容Openai格式可以方便被各种第三方应用调用，第三方开发者无需对已有功能做修改
+][
+#figure(
+  image("./img/api.png", width: 100%),
+  caption: [API回答],
+)
+]
+
+#slide()[
+SSE（Server-Sent Events）是一种Web技术，它允许服务器实时向客户端推送数据。
+
+相比于传统的轮询和长轮询机制，SSE提供了一种更高效且实时的数据推送方式。
+
+用于给前端实现API对话。
+][
+#figure(
+  image("./img/api-sse.png", width: 100%),
+  caption: [API-SSE支持],
+)
+]
