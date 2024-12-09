@@ -128,7 +128,7 @@ async def process_import_task(base_id:int,max_len: int, over_leap: int, file_pat
 async def knowledgecontent_upload(request: Request,file: UploadFile = File(...)):
     try:
         # 使用相对路径指定上传文件夹
-        upload_folder = os.path.join("app", "upload")
+        upload_folder = "upload"
         os.makedirs(upload_folder, exist_ok=True)  # 确保目标文件夹存在
         file_path = os.path.join(upload_folder, file.filename)
 
