@@ -181,6 +181,21 @@ TODO
 ]
 
 
+
+== 模型封装
+
+#slide()[
+为了方便后台增删改查的实现，创建了BaseModel，封装了数据库的增删改查操作。
+
+每个表的模型类继承自BaseModel类，可以直接调用父类的方法，减少了重复代码的编写。
+
+][
+#figure(
+  image("./img/BaseModel.png", width: 80%),
+  caption: [基类模型],
+)
+]
+
 == 兼容Openai API
 
 
