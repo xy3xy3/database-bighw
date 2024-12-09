@@ -117,38 +117,57 @@
 
 == 后台
 
+
 #slide()[
 
-#figure(
-  image("./img/console.png", width: 80%),
-  caption: [后台首页],
-)
+=== 表格增删改查 
 
-#figure(
-  image("./img/knowledgebase.png", width: 80%),
-  caption: [知识库],
-)
+表格增伤改查，在业界一般称为CRUD操作，是指对数据库中的数据进行增加、查询、修改和删除操作。
+
+借助LayuiAdmin，实现了搜索，分页，添加，修改，删除，批量删除等功能。
+
 ][
+  
 #figure(
-  image("./img/knowledgecontent.png", width: 80%),
-  caption: [知识内容],
-)
-#figure(
-  image("./img/model.png", width: 80%),
-  caption: [模型管理],
+  image("./img/message.png", width: 60%),
+  caption: [消息内容],
 )
 ]
 
 #slide()[
 
 #figure(
-  image("./img/agent.png", width: 80%),
+  image("./img/agent.png", width: 60%),
   caption: [智能体管理],
 )
 
 #figure(
-  image("./img/message.png", width: 80%),
-  caption: [消息内容],
+  image("./img/model.png", width: 60%),
+  caption: [模型管理],
+)
+][
+  
+#figure(
+  image("./img/knowledgecontent.png", width: 60%),
+  caption: [知识内容],
+)
+#figure(
+  image("./img/knowledgebase.png", width: 60%),
+  caption: [知识库],
+)
+]
+
+#slide()[
+
+=== 知识上传 
+TODO
+]
+
+#slide()[
+=== 其余页面
+#figure(
+  image("./img/console.png", width: 80%),
+  caption: [后台首页],
 )
 ][
 #figure(
@@ -161,16 +180,7 @@
 )
 ]
 
-== 知识库RAG搜索
 
-用户问题会先被大模型扩展为更多问题，之后调用接口Embedding，然后把向量在数据库中匹配相似的TopN个结果
-
-由于FastAPI特性，链接数据库，调用大模型接口均使用协程
-使得我们的搜索速度非常快
-#figure(
-  image("./img/quick-search.png", width: 50%),
-  caption: [RAG搜索],
-)
 == 兼容Openai API
 
 
@@ -195,3 +205,14 @@ SSE（Server-Sent Events）是一种Web技术，它允许服务器实时向客�
   caption: [API-SSE支持],
 )
 ]
+
+== 知识库RAG搜索
+
+用户问题会先被大模型扩展为更多问题，之后调用接口Embedding，然后把向量在数据库中匹配相似的TopN个结果
+
+由于FastAPI特性，链接数据库，调用大模型接口均使用协程
+使得我们的搜索速度非常快
+#figure(
+  image("./img/quick-search.png", width: 50%),
+  caption: [RAG搜索],
+)
