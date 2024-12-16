@@ -84,6 +84,8 @@
 
 == 后端
 
+=== 概述
+
 - 基于Python fastapi开发,使用非阻塞式协程
 
 - 用`psycopg3`协程链接数据库
@@ -93,6 +95,22 @@
 - 通过`AsyncOpenAI`库链接兼容OpenAI接口的国产大模型平台`DeepSeek`,`智谱`
 
 - 根据OpenAI接口规范,模拟出了他们的`chat`接口,方便任何支持对接OpenAI的项目使用我们API
+
+
+#slide()[
+=== FastAPI优势
+
+  对比来源：https://www.techempower.com/
+
+  #figure(
+  image("./img/round21.png", width: 60%),
+  caption: [22年结果],
+)
+  #figure(
+  image("./img/round22.png", width: 60%),
+  caption: [23年结果],
+)
+]
 
 == 前端
 
