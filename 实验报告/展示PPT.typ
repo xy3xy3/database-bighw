@@ -114,6 +114,17 @@
   caption: [前台],
 )
 
+== 使用其他前台程序 
+
+由于我们支持openai接口，所以可以使用任何支持openai接口的前台程序，比如`nextchat`。
+
+可以访问`nextweb.sysumsc.cn`体验，输入`db.dorm.skyw.cc`作为API地址,`sk-123`为密钥，即可使用
+
+#figure(
+  image("./img/nextchat.png", width: 50%),
+  caption: [nextchat],
+)
+
 
 == 后台
 
