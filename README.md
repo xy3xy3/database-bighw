@@ -45,6 +45,11 @@ a_model_id(答案生成模型id),a_prompt(答案生成的提示，可能需要�
 
 # 环境配置
 
+opengauss datavec docker
+```shell
+docker run --name opengauss --privileged=true -d -e GS_PASSWORD=OGSql@123 -v ./data:/var/lib/opengauss -p 5432:5432 swr.cn-north-4.myhuaweicloud.com/opengauss-x86-64/opengauss-datavec:7.0.0-rc1
+```
+
 使用conda python 3.12 环境
 ```shell
 conda create -n dbhw python=3.12 -y
