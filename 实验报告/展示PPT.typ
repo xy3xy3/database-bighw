@@ -144,7 +144,7 @@ DataVec是一个基于openGauss的向量引擎，目前支持的向量功能有�
 #slide()[
 
 #figure(
-  image("./img/er.png", width: 100%),
+  image("./img/er.png", width: 90%),
   caption: [数据库ER图],
 )
 ]
@@ -158,16 +158,23 @@ DataVec是一个基于openGauss的向量引擎，目前支持的向量功能有�
 = 效果展示
 
 == 前台
+#slide[
 
-
-各位同学可以使用校园网访问`db.dorm.skyw.cc`预览网页
+各位同学可以使用校园网访问#link("https://db.dorm.skyw.cc")预览网页
 
 目前导入了网络中心的一些QA做知识库,可以问该类型问题测试,比如校园网,电子邮箱等问题.
 
+#show: rest => columns(2, rest)
 #figure(
-  image("./img/frontend.png", width: 50%),
+  image("./img/qr.png", width: 60%),
+  caption: [二维码],
+)
+#figure(
+  image("./img/frontend.png", width: 100%),
   caption: [前台],
 )
+
+]
 
 == 使用其他前台程序
 
