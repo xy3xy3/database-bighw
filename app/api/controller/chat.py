@@ -114,25 +114,30 @@ async def chat_endpoint(request: ChatRequest, authorization: Optional[str] = Hea
             else:
                 messages.append({"role": msg.role, "content": msg.content})
 
-        # 问题优化模型
-        q_model = agent['q_model']
-        if q_model['type'] != 1:
-            raise HTTPException(status_code=400, detail="指定的模型不是问题优化模型")
-        q_client = ai(api_key=q_model['api_key'], base_url=q_model['base_url'])
-        q_prompt = agent['q_prompt']
-        questions = await questions_optimization(client=q_client, model=q_model['name'], messages=messages)
-        origin_question = messages[-1]['content']
-        if isinstance(questions, list):
-            questions = [item['question'] for item in questions]
-        elif isinstance(questions, dict):
-            if questions.get("questions") and isinstance(questions.get("questions"), list):
-                questions = [item['question'] for item in questions.get("questions")]
-            elif questions.get("question") and isinstance(questions.get("question"), str):
-                questions = [questions.get("question"), origin_question]
+        q_model = agent.get("q_model",None)
+        base_ids = agent['base_ids'].split(",")
+        a_prompt = agent['a_prompt']
+        if len(base_ids) > 0 and base_ids[0]!="0" and q_model:
+            # 有关联知识库才需要优化问题
+            if q_model['type'] != 1:
+                raise HTTPException(status_code=400, detail="指定的模型不是问题优化模型")
+            q_client = ai(api_key=q_model['api_key'], base_url=q_model['base_url'])
+            q_prompt = agent['q_prompt']
+            questions = await questions_optimization(client=q_client, model=q_model['name'], messages=messages)
+            origin_question = messages[-1]['content']
+            if isinstance(questions, list):
+                questions = [item['question'] for item in questions]
+            elif isinstance(questions, dict):
+                if questions.get("questions") and isinstance(questions.get("questions"), list):
+                    questions = [item['question'] for item in questions.get("questions")]
+                elif questions.get("question") and isinstance(questions.get("question"), str):
+                    questions = [questions.get("question"), origin_question]
+                else:
+                    questions = [origin_question]
             else:
                 questions = [origin_question]
         else:
-            questions = [origin_question]
+            questions = [messages[-1]['content']]
         user_message = {
             "session_id": session_id,
             "role": "user",
@@ -140,9 +145,7 @@ async def chat_endpoint(request: ChatRequest, authorization: Optional[str] = Hea
             "agent_id":id,
         }
         await message_model.save(user_message)
-        base_ids = agent['base_ids'].split(",")
-        a_prompt = agent['a_prompt']
-        if len(base_ids) > 0:
+        if len(base_ids) > 0 and base_ids[0]!="0":
             knowledges = await get_knowledges(base_ids, questions, top_n)
             knowledges_text = "\n\n".join(knowledges)
             questions_str = ",".join(questions)

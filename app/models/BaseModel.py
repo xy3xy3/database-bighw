@@ -116,7 +116,7 @@ class BaseModel:
                 mapping = {row[source]: row[target] for row in results}
                 return mapping
 
-    async def get_options_list(self, value_field: str, label_field: str, conditions: Optional[dict] = None):
+    async def get_options_list(self, value_field: str, label_field: str, conditions: Optional[dict] = None,allow_empty:bool=False) -> list:
         """获取选项列表，格式为 [{value: ..., label: ...}, ...]"""
         sql = f'SELECT "{value_field}" AS value, "{label_field}" AS label FROM "{self.db_schema}"."{self.table_name}"'
         params = {}
@@ -128,7 +128,10 @@ class BaseModel:
             async with conn.cursor(row_factory=psycopg.rows.dict_row) as cur:
                 await cur.execute(sql, params if params else None)
                 results = await cur.fetchall()
-                return [dict(row) for row in results]
+                res = [dict(row) for row in results]
+                if allow_empty:
+                    res.insert(0,{"value":"","label":"请选择"})
+                return res
 
     # 事务管理示例
     async def begin_transaction(self):

@@ -21,24 +21,28 @@ class AgentModel(BaseModel):
 
         q_model = await self.model_model.get_model_by_id(agent['q_model_id'])
         if not q_model:
-            raise ValueError("问题优化模型未找到")
+            q_model = None
+            # raise ValueError("问题优化模型未找到")
 
         a_model = await self.model_model.get_model_by_id(agent['a_model_id'])
         if not a_model:
             raise ValueError("对话模型未找到")
-
+        if q_model:
+            q_model_dict = {
+                    "id": q_model['id'],
+                    "name": q_model['name'],
+                    "base_url": q_model['base_url'],
+                    "api_key": q_model['api_key'],
+                    "type": q_model['model_type']
+                }
+        else:
+            q_model_dict = None
         agent_details = {
             "id": agent['id'],
             "name": agent['name'],
             "base_ids": agent['base_ids'],
             "top_n": agent['top_n'],
-            "q_model": {
-                "id": q_model['id'],
-                "name": q_model['name'],
-                "base_url": q_model['base_url'],
-                "api_key": q_model['api_key'],
-                "type": q_model['model_type']
-            },
+            "q_model": q_model_dict,
             "q_prompt": agent['q_prompt'],
             "a_model": {
                 "id": a_model['id'],

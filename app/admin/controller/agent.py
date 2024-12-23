@@ -26,7 +26,7 @@ async def agent_list(request: Request):
 @login_required
 async def agent_form(request: Request):
     model = ModelModel()
-    models = await model.get_options_list("id","name",{"model_type":1})  # 获取所有模型数据
+    models = await model.get_options_list("id","name",{"model_type":1},allow_empty=True)  # 获取所有模型数据
     print(models)
     return templates.TemplateResponse("agent_form.html", {"request": request, "models": models})
 # 搜索Agent
@@ -64,7 +64,11 @@ async def agent_save(request: Request):
     name = form_data.get("name")
     base_ids = form_data.get("base_ids")
     top_n = int(form_data.get("top_n"))
-    q_model_id = int(form_data.get("q_model_id"))
+    q_model_id= form_data.get("q_model_id","")
+    if q_model_id=="":
+        q_model_id=0
+    else:
+        q_model_id = int(q_model_id)
     q_prompt = form_data.get("q_prompt")
     a_model_id = int(form_data.get("a_model_id"))
     a_prompt = form_data.get("a_prompt")

@@ -4,13 +4,13 @@
     {% from 'form_macros.html' import input_field, textarea_field, select_field %}
 
     {{ input_field('名称', 'name', '请输入Agent名称', required=True) }}
-    {{ input_field('知识库IDs', 'base_ids', '请输入知识库IDs (逗号分隔)', required=True) }}
-    {{ input_field('引用文本段上限', 'top_n', '请输入引用文本段上限', required=True, type='number') }}
+    {{ input_field('知识库IDs', 'base_ids', '请输入知识库IDs (逗号分隔)', required=False) }}
+    {{ input_field('引用文本段上限', 'top_n', '请输入引用文本段上限', required=False, type='number') }}
 
     <!-- 使用传递的模型数据生成下拉选择框 -->
-    {{ select_field('问题模型ID', 'q_model_id', options=models, required=True) }}
+    {{ select_field('问题模型ID', 'q_model_id', options=models, required=False) }}
 
-    {{ textarea_field('问题提示', 'q_prompt', '请输入问题提示', required=True) }}
+    {{ textarea_field('问题提示', 'q_prompt', '请输入问题提示', required=False) }}
 
     <!-- 使用传递的模型数据生成下拉选择框 -->
     {{ select_field('答案模型ID', 'a_model_id', options=models, required=True) }}
